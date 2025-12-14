@@ -11,7 +11,7 @@ const ALL_LOBBIES = [
     game: 'HOK',
     title: 'Push Rank : ROAD TO LEGEND',
     rank: 'Grandmaster',
-    time: 'Just Now',
+    createdAt: new Date(),
     tagColor: 'bg-indigo-900/50 text-indigo-300',
     creator: 'ProGamer123'
   },
@@ -20,7 +20,7 @@ const ALL_LOBBIES = [
     game: 'MLBB',
     title: 'Cari Team untuk Push rank',
     rank: 'Mythical Glory',
-    time: 'Just Now',
+    createdAt: new Date(Date.now() - 5 * 60000), // 5 minutes ago
     tagColor: 'bg-blue-900/50 text-blue-300',
     creator: 'MLBBMaster'
   },
@@ -29,7 +29,7 @@ const ALL_LOBBIES = [
     game: 'Valorant',
     title: 'Cari Teman Untuk mabar ',
     rank: 'Radiant',
-    time: 'Just Now',
+    createdAt: new Date(Date.now() - 15 * 60000), // 15 minutes ago
     tagColor: 'bg-purple-900/50 text-purple-300',
     creator: 'ValorantAce'
   },
@@ -38,7 +38,7 @@ const ALL_LOBBIES = [
     game: 'PUBG',
     title: 'Bantu Push sampai Ace',
     rank: 'Crown',
-    time: '5m ago',
+    createdAt: new Date(Date.now() - 12 * 60 * 60000), // 12 hours ago
     tagColor: 'bg-yellow-900/50 text-yellow-300',
     creator: 'PUBGKing'
   },
@@ -47,7 +47,7 @@ const ALL_LOBBIES = [
     game: 'COD',
     title: 'Push Rank Sampai LEGEND!',
     rank: 'Grandmaster',
-    time: '12m ago',
+    createdAt: new Date(Date.now() - 2 * 60 * 60000), // 2 hours ago
     tagColor: 'bg-green-900/50 text-green-300',
     creator: 'CODLegend'
   },
@@ -56,7 +56,7 @@ const ALL_LOBBIES = [
     game: 'HOK',
     title: 'Mabar santai Classic',
     rank: 'Platinum',
-    time: '15m ago',
+    createdAt: new Date(Date.now() - 24 * 60 * 60000), // 1 day ago
     tagColor: 'bg-indigo-900/50 text-indigo-300',
     creator: 'HOKChill'
   },
@@ -67,6 +67,20 @@ const CATEGORIES = ['ALL', 'HOK', 'MLBB', 'VALORANT', 'PUBG', 'COD'];
 export default function LobbyPage() {
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+
+  // Function to get relative time
+  const getRelativeTime = (date) => {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (minutes < 1) return 'Just Now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
 
   // Logic Filter
   const filteredLobbies = ALL_LOBBIES.filter(lobby => 
@@ -171,7 +185,7 @@ export default function LobbyPage() {
                     <span className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${item.tagColor} bg-opacity-20`}>
                     {item.game}
                     </span>
-                    <span className="text-xs text-gray-500 font-medium">{item.time}</span>
+                    <span className="text-xs text-gray-500 font-medium">{getRelativeTime(item.createdAt)}</span>
                 </div>
 
                 {/* Title */}

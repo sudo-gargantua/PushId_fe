@@ -147,7 +147,7 @@ const App = () => {
               </h1>
               <div className="mt-12 pointer-events-auto">
                 <button 
-                  onClick={() => router.push('/lobby')} 
+                  onClick={() => router.push('/lobby')}
                   className="group relative px-10 py-4 bg-[#5865F2] hover:bg-[#4d5bf0] text-white text-lg font-bold rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(88,101,242,0.6)] hover:shadow-[0_0_40px_rgba(88,101,242,0.8)] active:scale-95"
                 >
                   <span className="tracking-widest uppercase">Join Squad!</span>
