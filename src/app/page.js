@@ -79,7 +79,7 @@ const App = () => {
           <button className="absolute top-8 right-8 text-white" onClick={() => setIsMenuOpen(false)}>
             <X size={32} />
           </button>
-          <a href="#" className="text-3xl font-bold text-[#6366f1]">Home</a>
+          <a className="text-3xl font-bold text-[#6366f1]">Home</a>
           <a href="#" className="text-3xl font-bold text-white">About</a>
         </div>
       )}
