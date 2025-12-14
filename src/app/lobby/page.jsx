@@ -134,7 +134,6 @@ export default function LobbyPage() {
               Create Team
             </a>
 
-            <button className="text-gray-300 hover:text-[#4a4ae0] transition">All Games</button>
           </div>
         </div>
 
