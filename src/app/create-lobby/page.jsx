@@ -15,6 +15,16 @@ export default function CreateLobby() {
         {/* FLOW: Isi Form (Judul, Game, Syarat, Link) */}
         <form className="space-y-6">
           
+          {/* --- BARU: Input Nama User --- */}
+          <div>
+            <label className="block text-sm font-bold mb-2 text-slate-300">Nama Username (In-Game)</label>
+            <input 
+              type="text" 
+              placeholder="Contoh: ElGato_Pro" 
+              className="w-full bg-[#0F172A] border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+            />
+          </div>
+
           {/* Input Judul */}
           <div>
             <label className="block text-sm font-bold mb-2 text-slate-300">Judul Postingan</label>
@@ -34,6 +44,7 @@ export default function CreateLobby() {
                 <option>Mobile Legends</option>
                 <option>Valorant</option>
                 <option>PUBG Mobile</option>
+                <option>Call of Duty</option>
               </select>
             </div>
             <div>
@@ -61,7 +72,7 @@ export default function CreateLobby() {
             <label className="block text-sm font-bold mb-2 text-slate-300">Link WhatsApp / Discord</label>
             <input 
               type="text" 
-              placeholder="https://wa.me/62..." 
+              placeholder="https://wa.me/62... atau https://discord.gg/..." 
               className="w-full bg-[#0F172A] border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:border-indigo-500"
             />
           </div>

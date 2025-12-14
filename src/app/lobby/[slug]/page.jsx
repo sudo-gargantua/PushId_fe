@@ -1,20 +1,21 @@
-// app/lobby/[slug]/page.jsx
+// src/app/lobby/[slug]/page.jsx
 "use client";
 import { useParams } from 'next/navigation';
+import Link from 'next/link';
 import ShareButton from "@/components/ShareButton";
 
-// Data Mockup (sama dengan lobby/page.jsx)
+// Data Mockup
 const ALL_LOBBIES = [
   {
     id: 1,
-    game: 'HOK',
-    title: 'Push Rank : ROAD TO LEGEND',
-    rank: 'Grandmaster',
+    game: 'Honor of Kings',
+    title: 'BUTUH JUNGLER YANG GAK ALERGI OBJECTIVE!',
+    rank: 'Grandmaster v',
     time: 'Just Now',
     tagColor: 'bg-indigo-900/50 text-indigo-300',
-    description: 'Mencari team untuk push rank dari Grandmaster ke Legend. Pemain aktif dan serius.',
+    description: 'Objective harus menang. Bisa Pakai Augran. Bisa Baca Peta. Peka Terhadap informasi.',
     playersNeeded: 3,
-    contact: 'https://wa.me/628123456789'
+    contact: 'https://discord.gg/abc123' // Link Discord (Akan jadi Ungu)
   },
   {
     id: 2,
@@ -36,7 +37,7 @@ const ALL_LOBBIES = [
     tagColor: 'bg-purple-900/50 text-purple-300',
     description: 'Mabar santai Valorant. Pemain Radiant mencari teman.',
     playersNeeded: 2,
-    contact: 'https://wa.me/628987654321'
+    contact: 'https://wa.me/628987654321' // Link WhatsApp (Akan jadi Hijau)
   },
   {
     id: 4,
@@ -82,7 +83,7 @@ export default function LobbyDetail() {
       <main className="min-h-screen bg-[#020617] text-slate-50 flex items-center justify-center p-4">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-400 mb-4">Lobby tidak ditemukan</h1>
-          <a href="/lobby" className="text-[#5C5CFF] hover:underline">Kembali ke Lobby</a>
+          <Link href="/lobby" className="text-[#5C5CFF] hover:underline">Kembali ke Lobby</Link>
         </div>
       </main>
     );
@@ -90,95 +91,132 @@ export default function LobbyDetail() {
 
   const link = lobby.contact;
 
-  // ---- Logic Deteksi Link ----
+  // ---- Logic 1: Deteksi Link untuk Warna Button ----
   function getButtonType(url) {
     if (!url) return "default";
-
-    // WhatsApp
-    if (url.includes("wa.me") || url.includes("whatsapp.com")) {
-      return "whatsapp";
-    }
-
-    // Discord
-    if (url.includes("discord.gg") || url.includes("discord.com")) {
-      return "discord";
-    }
-
+    if (url.includes("wa.me") || url.includes("whatsapp.com")) return "whatsapp";
+    if (url.includes("discord.gg") || url.includes("discord.com")) return "discord";
     return "default";
   }
 
   const btnType = getButtonType(link);
 
+  // Styling Button sesuai permintaan (Hijau WA, Ungu Discord)
   const buttonStyle = {
-    whatsapp: "bg-green-600 hover:bg-green-500 text-white",
-    discord: "bg-[#4f46e5] hover:bg-[#4338ca] text-white",
+    whatsapp: "bg-[#25D366] hover:bg-[#128C7E] text-white shadow-[0_0_20px_rgba(37,211,102,0.4)] border border-[#25D366]",
+    discord: "bg-[#5865F2] hover:bg-[#4752C4] text-white shadow-[0_0_20px_rgba(88,101,242,0.4)] border border-[#5865F2]",
     default: "bg-slate-700 hover:bg-slate-600 text-white",
   }[btnType];
 
   const buttonText = {
-    whatsapp: "Chat WhatsApp",
-    discord: "Join Discord",
-    default: "Kunjungi Link",
+    whatsapp: "CHAT WHATSAPP NOW!",
+    discord: "JOIN DISCORD NOW!",
+    default: "KUNJUNGI LINK",
   }[btnType];
 
+
+  // ---- Logic 2: Warna Badge Game "Cerah" (Neon Style) ----
+  const getGameBadgeStyle = (gameName) => {
+    // Mapping warna cerah berdasarkan nama game
+    const styles = {
+      'Honor of Kings': 'bg-amber-400 text-black shadow-[0_0_15px_rgba(251,191,36,0.6)]',
+      'HOK': 'bg-amber-400 text-black shadow-[0_0_15px_rgba(251,191,36,0.6)]',
+      'MLBB': 'bg-cyan-400 text-black shadow-[0_0_15px_rgba(34,211,238,0.6)]',
+      'Valorant': 'bg-rose-500 text-white shadow-[0_0_15px_rgba(244,63,94,0.6)]',
+      'PUBG': 'bg-yellow-500 text-black shadow-[0_0_15px_rgba(234,179,8,0.6)]',
+      'COD': 'bg-emerald-500 text-black shadow-[0_0_15px_rgba(16,185,129,0.6)]',
+    };
+    return styles[gameName] || 'bg-purple-500 text-white shadow-[0_0_15px_rgba(168,85,247,0.6)]'; // Default
+  };
+
+  const descriptionPoints = lobby.description.split('.').filter(item => item.trim() !== '');
+
   return (
-    <main className="min-h-screen bg-[#020617] text-slate-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <div className="mb-6">
-          <a href="/lobby" className="text-[#5C5CFF] hover:underline text-lg">&larr; Kembali ke Lobby</a>
+    <main className="min-h-screen bg-[#020617] text-slate-50 p-4 md:p-8 flex flex-col items-center justify-center">
+      
+      {/* Container Utama */}
+      <div className="w-full max-w-5xl bg-[#0F172A] border border-slate-800 rounded-3xl overflow-hidden shadow-2xl flex flex-col md:flex-row">
+        
+        {/* KOLOM KIRI: Detail Info */}
+        <div className="flex-1 p-8 md:p-12 relative">
+            
+            {/* Game Badge Kecil (Atas Kiri) */}
+            <div className="mb-6">
+                <span className="inline-block px-4 py-2 rounded-lg bg-[#1e2235] text-[#5C5CFF] font-bold text-sm tracking-wide">
+                    {lobby.game}
+                </span>
+            </div>
+
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 uppercase leading-tight">
+                {lobby.title}
+            </h1>
+
+            {/* Rank / Tier */}
+            <div className="mb-10">
+                <span className="text-yellow-500 font-medium text-lg">
+                    Tier : {lobby.rank}
+                </span>
+            </div>
+
+            {/* Box Ketentuan */}
+            <div className="bg-[#111625] border border-slate-700/50 rounded-2xl p-6 md:p-8 min-h-[200px]">
+                <h3 className="text-xl font-bold text-white mb-4">Ketentuan</h3>
+                <ul className="space-y-2">
+                    {descriptionPoints.length > 0 ? (
+                        descriptionPoints.map((point, index) => (
+                            <li key={index} className="flex items-start text-gray-300">
+                                <span className="mr-2 text-[#5C5CFF]">•</span>
+                                {point.trim()}
+                            </li>
+                        ))
+                    ) : (
+                        <li className="text-gray-400 italic">Tidak ada deskripsi khusus.</li>
+                    )}
+                </ul>
+            </div>
         </div>
 
-        <div className="bg-[#0F172A] border border-slate-800 rounded-2xl p-8 shadow-2xl">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-6">
-            <div>
-              <span className={`inline-block px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wider ${lobby.tagColor} bg-opacity-20 mb-4`}>
-                {lobby.game}
-              </span>
-              <h1 className="text-3xl font-bold text-white mb-2">{lobby.title}</h1>
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                <span className="text-lg text-yellow-500 font-medium">{lobby.rank}</span>
-              </div>
-              <p className="text-sm text-gray-400">{lobby.time}</p>
-            </div>
-            <ShareButton />
-          </div>
+        {/* KOLOM KANAN: Profil & Action */}
+        <div className="md:w-[400px] bg-[#0b1121] md:border-l border-slate-800 p-8 md:p-12 flex flex-col items-center justify-between">
+            
+            <div className="flex flex-col items-center w-full">
+                {/* Avatar Placeholder */}
+                <div className="w-32 h-32 bg-gray-300 rounded-full mb-6 border-4 border-[#1e2235]"></div>
+                
+                {/* Username */}
+                <h2 className="text-xl font-bold text-white tracking-widest uppercase mb-8">EL'GATO</h2>
 
-          {/* Description */}
-          <div className="mb-8">
-            <h2 className="text-xl font-bold text-white mb-4">Deskripsi</h2>
-            <p className="text-gray-300 leading-relaxed">{lobby.description}</p>
-          </div>
-
-          {/* Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-[#1e2230] rounded-xl p-6">
-              <h3 className="text-lg font-bold text-white mb-2">Pemain Dibutuhkan</h3>
-              <p className="text-2xl font-bold text-[#5C5CFF]">{lobby.playersNeeded}</p>
+                {/* --- REVISI: Game Tag Tunggal & Cerah --- */}
+                <div className="w-full mb-8 flex justify-center">
+                   <span className={`px-6 py-2 rounded-lg font-bold text-sm tracking-widest uppercase transform hover:scale-105 transition-transform duration-300 ${getGameBadgeStyle(lobby.game)}`}>
+                      {lobby.game}
+                   </span>
+                </div>
             </div>
-            <div className="bg-[#1e2230] rounded-xl p-6">
-              <h3 className="text-lg font-bold text-white mb-2">Game</h3>
-              <p className="text-xl text-gray-300">{lobby.game}</p>
-            </div>
-          </div>
 
-          {/* Action Button */}
-          <div className="flex gap-4">
-            <a
-              href={link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`flex-1 py-4 px-6 rounded-xl font-bold text-center transition-all duration-300 ${buttonStyle}`}
-            >
-              {buttonText}
-            </a>
-          </div>
+            {/* --- REVISI: CTA Button (Dynamic Color) --- */}
+            <div className="w-full">
+                 <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`block w-full py-4 rounded-xl font-bold text-center uppercase tracking-wider transition-all duration-300 transform hover:scale-105 ${buttonStyle}`}
+                >
+                  {buttonText}
+                </a>
+            </div>
+
         </div>
       </div>
+
+      {/* Tombol Back */}
+      <div className="mt-8">
+        <Link href="/lobby" className="bg-[#1e2235] text-[#5C5CFF] hover:bg-[#2a304a] font-bold py-3 px-10 rounded-lg uppercase tracking-wide text-sm transition-colors border border-slate-800">
+            Back
+        </Link>
+      </div>
+
     </main>
   );
 }
-
-
