@@ -1,7 +1,7 @@
 'use client'; 
 
-import React, { useState } from 'react';
-import { User } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { User, Bell } from 'lucide-react';
 import Link from 'next/link';
 
 // Data Mockup
@@ -11,7 +11,7 @@ const ALL_LOBBIES = [
     game: 'HOK',
     title: 'Push Rank : ROAD TO LEGEND',
     rank: 'Grandmaster',
-    time: 'Just Now',
+    createdAt: new Date(),
     tagColor: 'bg-indigo-900/50 text-indigo-300',
     creator: 'ProGamer123'
   },
@@ -20,7 +20,7 @@ const ALL_LOBBIES = [
     game: 'MLBB',
     title: 'Cari Team untuk Push rank',
     rank: 'Mythical Glory',
-    time: 'Just Now',
+    createdAt: new Date(Date.now() - 5 * 60000), // 5 minutes ago
     tagColor: 'bg-blue-900/50 text-blue-300',
     creator: 'MLBBMaster'
   },
@@ -29,7 +29,7 @@ const ALL_LOBBIES = [
     game: 'Valorant',
     title: 'Cari Teman Untuk mabar ',
     rank: 'Radiant',
-    time: 'Just Now',
+    createdAt: new Date(Date.now() - 15 * 60000), // 15 minutes ago
     tagColor: 'bg-purple-900/50 text-purple-300',
     creator: 'ValorantAce'
   },
@@ -38,7 +38,7 @@ const ALL_LOBBIES = [
     game: 'PUBG',
     title: 'Bantu Push sampai Ace',
     rank: 'Crown',
-    time: '5m ago',
+    createdAt: new Date(Date.now() - 12 * 60 * 60000), // 12 hours ago
     tagColor: 'bg-yellow-900/50 text-yellow-300',
     creator: 'PUBGKing'
   },
@@ -47,7 +47,7 @@ const ALL_LOBBIES = [
     game: 'COD',
     title: 'Push Rank Sampai LEGEND!',
     rank: 'Grandmaster',
-    time: '12m ago',
+    createdAt: new Date(Date.now() - 2 * 60 * 60000), // 2 hours ago
     tagColor: 'bg-green-900/50 text-green-300',
     creator: 'CODLegend'
   },
@@ -56,7 +56,7 @@ const ALL_LOBBIES = [
     game: 'HOK',
     title: 'Mabar santai Classic',
     rank: 'Platinum',
-    time: '15m ago',
+    createdAt: new Date(Date.now() - 24 * 60 * 60000), // 1 day ago
     tagColor: 'bg-indigo-900/50 text-indigo-300',
     creator: 'HOKChill'
   },
@@ -67,6 +67,41 @@ const CATEGORIES = ['ALL', 'HOK', 'MLBB', 'VALORANT', 'PUBG', 'COD'];
 export default function LobbyPage() {
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showNotifications, setShowNotifications] = useState(false);
+  const dropdownRef = useRef(null);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowNotifications(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Mock notifications
+  const notifications = [
+    { id: 1, type: 'admin', message: 'Server maintenance scheduled for tonight at 10 PM', time: '2h ago' },
+    { id: 2, type: 'system', message: 'New lobby "Epic Battle" has been created', time: '1h ago' },
+    { id: 3, type: 'admin', message: 'Update: New game modes available in HOK', time: '30m ago' },
+    { id: 4, type: 'system', message: 'Your lobby "Push Rank" is now active', time: '15m ago' }
+  ];
+
+  // Function to get relative time
+  const getRelativeTime = (date) => {
+    const now = new Date();
+    const diff = now - date;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+
+    if (minutes < 1) return 'Just Now';
+    if (minutes < 60) return `${minutes}m ago`;
+    if (hours < 24) return `${hours}h ago`;
+    return `${days}d ago`;
+  };
 
   // Logic Filter
   const filteredLobbies = ALL_LOBBIES.filter(lobby => 
@@ -106,6 +141,43 @@ export default function LobbyPage() {
         {/* User Kanan */}
         <div className="flex justify-end">
           <div className="flex items-center gap-4">
+            {/* Notification Bell */}
+            <div className="relative" ref={dropdownRef}>
+              <button 
+                onClick={() => setShowNotifications(!showNotifications)}
+                className="w-12 h-12 rounded-full border-2 border-[#5C5CFF] flex items-center justify-center cursor-pointer hover:bg-[#5C5CFF]/20 transition group relative"
+              >
+                <Bell size={24} className="text-[#5C5CFF] group-hover:text-white transition" />
+                {notifications.length > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                    {notifications.length}
+                  </span>
+                )}
+              </button>
+
+              {/* Notification Dropdown */}
+              {showNotifications && (
+                <div className="absolute top-14 right-0 w-80 bg-[#0F172A] border border-[#1e2230] rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
+                  <div className="p-4 border-b border-[#1e2230]">
+                    <h3 className="text-lg font-bold text-white">Notifications</h3>
+                  </div>
+                  <div className="p-2">
+                    {notifications.map((notif) => (
+                      <div key={notif.id} className="p-3 border-b border-[#1e2230] last:border-b-0 hover:bg-[#1e2230] transition">
+                        <div className="flex items-start gap-3">
+                          <div className={`w-2 h-2 rounded-full mt-2 ${notif.type === 'admin' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+                          <div className="flex-1">
+                            <p className="text-sm text-gray-300">{notif.message}</p>
+                            <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
             <span className="hidden md:block font-bold text-xl text-gray-200">Hello Users</span>
             
             <a href="/login" className="w-12 h-12 rounded-full border-2 border-[#5C5CFF] flex items-center justify-center cursor-pointer hover:bg-[#5C5CFF]/20 transition group">
@@ -171,7 +243,7 @@ export default function LobbyPage() {
                     <span className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${item.tagColor} bg-opacity-20`}>
                     {item.game}
                     </span>
-                    <span className="text-xs text-gray-500 font-medium">{item.time}</span>
+                    <span className="text-xs text-gray-500 font-medium">{getRelativeTime(item.createdAt)}</span>
                 </div>
 
                 {/* Title */}
