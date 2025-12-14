@@ -70,10 +70,12 @@ export default function LobbyPage() {
     <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-purple-500 selection:text-white">
       
       {/* --- NAVBAR --- */}
-      <nav className="flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
-        {/* Menu Kiri */}
-        <div className="flex items-center gap-8 md:gap-12">
-          {/* Menu Links */}
+      <nav className="grid grid-cols-3 items-center px-6 py-6 max-w-7xl mx-auto">
+        {/* Kosong Kiri */}
+        <div></div>
+
+        {/* Menu Tengah */}
+        <div className="flex justify-center">
           <div className="flex gap-6 text-lg font-bold">
             {/* Menggunakan <a> untuk kompatibilitas preview. Gunakan <Link> di project Next.js asli */}
             <a href="/" className="text-gray-300 hover:text-[#4a4ae0] transition">
@@ -93,12 +95,14 @@ export default function LobbyPage() {
         </div>
 
         {/* User Kanan */}
-        <div className="flex items-center gap-4">
-          <span className="hidden md:block font-bold text-xl text-gray-200">Hello Users</span>
-          
-          <a href="/login" className="w-12 h-12 rounded-full border-2 border-[#5C5CFF] flex items-center justify-center cursor-pointer hover:bg-[#5C5CFF]/20 transition group">
-             <User size={28} className="text-[#5C5CFF] group-hover:text-white transition" />
-          </a>
+        <div className="flex justify-end">
+          <div className="flex items-center gap-4">
+            <span className="hidden md:block font-bold text-xl text-gray-200">Hello Users</span>
+            
+            <a href="/login" className="w-12 h-12 rounded-full border-2 border-[#5C5CFF] flex items-center justify-center cursor-pointer hover:bg-[#5C5CFF]/20 transition group">
+               <User size={28} className="text-[#5C5CFF] group-hover:text-white transition" />
+            </a>
+          </div>
         </div>
       </nav>
 
