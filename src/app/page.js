@@ -60,12 +60,12 @@ const App = () => {
         </div>
 
         {/* User Profile - Right Aligned */}
-        <div className="hidden md:flex items-center justify-end gap-4 w-[200px]">
-          <span className="font-bold text-gray-200 tracking-wide text-lg">Hello Users</span>
-          <div className="w-11 h-11 rounded-full border-2 border-[#6366f1] flex items-center justify-center bg-[#6366f1]/20 text-[#6366f1] shadow-[0_0_10px_rgba(99,102,241,0.3)]">
+        <Link href="/login" className="hidden md:flex items-center justify-end gap-4 w-[200px] cursor-pointer">
+          <span className="font-bold text-gray-200 hover:text-white tracking-wide text-lg transition-colors">Hello Users</span>
+          <div className="w-11 h-11 rounded-full border-2 border-[#6366f1] hover:border-[#818cf8] flex items-center justify-center bg-[#6366f1]/20 hover:bg-[#6366f1]/40 text-[#6366f1] hover:text-[#818cf8] shadow-[0_0_10px_rgba(99,102,241,0.3)] hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all">
             <User size={22} strokeWidth={2.5} />
           </div>
-        </div>
+        </Link>
 
         {/* Mobile Toggle */}
         <button className="md:hidden text-white ml-auto" onClick={() => setIsMenuOpen(!isMenuOpen)}>
