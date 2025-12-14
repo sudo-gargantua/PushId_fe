@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import Link from 'next/link';
 import { User, Gamepad2, Menu, X } from 'lucide-react';
 
 const App = () => {
@@ -116,11 +117,13 @@ const App = () => {
 
             {/* CTA Button */}
             <div className="mt-12 pointer-events-auto">
-              <button className="group relative px-10 py-4 bg-[#5865F2] hover:bg-[#4d5bf0] text-white text-lg font-bold rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(88,101,242,0.6)] hover:shadow-[0_0_40px_rgba(88,101,242,0.8)] active:scale-95">
-                <span className="tracking-widest uppercase">Join Squad!</span>
-                {/* Button Glow */}
-                <div className="absolute inset-0 rounded-full ring-2 ring-white/20 group-hover:ring-white/40 transition-all" />
-              </button>
+              <Link href="/login">
+                <button className="group relative px-10 py-4 bg-[#5865F2] hover:bg-[#4d5bf0] text-white text-lg font-bold rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(88,101,242,0.6)] hover:shadow-[0_0_40px_rgba(88,101,242,0.8)] active:scale-95">
+                  <span className="tracking-widest uppercase">Join Squad!</span>
+                  {/* Button Glow */}
+                  <div className="absolute inset-0 rounded-full ring-2 ring-white/20 group-hover:ring-white/40 transition-all" />
+                </button>
+              </Link>
             </div>
 
           </div>
