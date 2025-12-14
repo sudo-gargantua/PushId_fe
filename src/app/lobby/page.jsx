@@ -12,7 +12,8 @@ const ALL_LOBBIES = [
     title: 'Push Rank : ROAD TO LEGEND',
     rank: 'Grandmaster',
     time: 'Just Now',
-    tagColor: 'bg-indigo-900/50 text-indigo-300'
+    tagColor: 'bg-indigo-900/50 text-indigo-300',
+    creator: 'ProGamer123'
   },
   {
     id: 2,
@@ -20,7 +21,8 @@ const ALL_LOBBIES = [
     title: 'Cari Team untuk Push rank',
     rank: 'Mythical Glory',
     time: 'Just Now',
-    tagColor: 'bg-blue-900/50 text-blue-300'
+    tagColor: 'bg-blue-900/50 text-blue-300',
+    creator: 'MLBBMaster'
   },
   {
     id: 3,
@@ -28,7 +30,8 @@ const ALL_LOBBIES = [
     title: 'Cari Teman Untuk mabar ',
     rank: 'Radiant',
     time: 'Just Now',
-    tagColor: 'bg-purple-900/50 text-purple-300'
+    tagColor: 'bg-purple-900/50 text-purple-300',
+    creator: 'ValorantAce'
   },
   {
     id: 4,
@@ -36,7 +39,8 @@ const ALL_LOBBIES = [
     title: 'Bantu Push sampai Ace',
     rank: 'Crown',
     time: '5m ago',
-    tagColor: 'bg-yellow-900/50 text-yellow-300'
+    tagColor: 'bg-yellow-900/50 text-yellow-300',
+    creator: 'PUBGKing'
   },
   {
     id: 5,
@@ -44,7 +48,8 @@ const ALL_LOBBIES = [
     title: 'Push Rank Sampai LEGEND!',
     rank: 'Grandmaster',
     time: '12m ago',
-    tagColor: 'bg-green-900/50 text-green-300'
+    tagColor: 'bg-green-900/50 text-green-300',
+    creator: 'CODLegend'
   },
   {
     id: 6,
@@ -52,7 +57,8 @@ const ALL_LOBBIES = [
     title: 'Mabar santai Classic',
     rank: 'Platinum',
     time: '15m ago',
-    tagColor: 'bg-indigo-900/50 text-indigo-300'
+    tagColor: 'bg-indigo-900/50 text-indigo-300',
+    creator: 'HOKChill'
   },
 ];
 
@@ -60,11 +66,14 @@ const CATEGORIES = ['ALL', 'HOK', 'MLBB', 'VALORANT', 'PUBG', 'COD'];
 
 export default function LobbyPage() {
   const [activeCategory, setActiveCategory] = useState('ALL');
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Logic Filter
-  const filteredLobbies = activeCategory === 'ALL' 
-    ? ALL_LOBBIES 
-    : ALL_LOBBIES.filter(lobby => lobby.game.toUpperCase() === activeCategory);
+  const filteredLobbies = ALL_LOBBIES.filter(lobby => 
+    (activeCategory === 'ALL' || lobby.game.toUpperCase() === activeCategory) &&
+    (lobby.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+     lobby.creator.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   return (
     <div className="min-h-screen bg-[#020617] text-white font-sans selection:bg-purple-500 selection:text-white">
@@ -121,6 +130,17 @@ export default function LobbyPage() {
            />
         </div>
 
+        {/* --- SEARCH BAR --- */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Cari lobby berdasarkan judul atau pembuat..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="w-full max-w-md px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all"
+          />
+        </div>
+
         {/* --- FILTERS --- */}
         <div className="flex flex-wrap gap-4 mb-10">
           {CATEGORIES.map((cat) => (
@@ -160,10 +180,13 @@ export default function LobbyPage() {
                 </h3>
 
                 {/* Rank Indicator */}
-                <div className="flex items-center gap-2 mb-8">
+                <div className="flex items-center gap-2 mb-4">
                     <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
                     <span className="text-sm text-yellow-500 font-medium">{item.rank}</span>
                 </div>
+
+                {/* Creator */}
+                <p className="text-sm text-gray-400 mb-4">Oleh: {item.creator}</p>
               </div>
 
               {/* Button Detail */}
