@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
+import { User } from 'lucide-react';
 
 export default function Home() {
   return (
@@ -41,6 +42,15 @@ export default function Home() {
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors"></div>
             </div>
 
+        </div>
+
+        {/* User Kanan */}
+        <div className="absolute top-6 right-8 z-10 flex items-center gap-4">
+          <span className="hidden md:block font-bold text-xl text-gray-200">Hello Users</span>
+          
+          <a href="/login" className="w-12 h-12 rounded-full border-2 border-[#5C5CFF] flex items-center justify-center cursor-pointer hover:bg-[#5C5CFF]/20 transition group">
+             <User size={28} className="text-[#5C5CFF] group-hover:text-white transition" />
+          </a>
         </div>
 
         {/* GRADIENT OVERLAY (Biar bawahnya agak gelap menyatu) */}
