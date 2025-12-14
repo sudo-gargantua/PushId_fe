@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { User } from 'lucide-react';
-// import Link from 'next/link'; // Di-disable agar preview berjalan di sini. Di Next.js asli, aktifkan kembali baris ini.
+import Link from 'next/link';
 
 // Data Mockup
 const ALL_LOBBIES = [
@@ -163,9 +163,11 @@ export default function LobbyPage() {
               </div>
 
               {/* Button Detail */}
-              <button className="w-full py-3 rounded-xl border border-[#2a2f42] bg-[#131620] text-gray-400 text-sm font-bold hover:bg-[#5C5CFF] hover:text-white hover:border-[#5C5CFF] transition-all duration-300">
-                Lihat detail
-              </button>
+              <Link href={`/lobby/${item.id}`}>
+                <button className="w-full py-3 rounded-xl border border-[#2a2f42] bg-[#131620] text-gray-400 text-sm font-bold hover:bg-[#5C5CFF] hover:text-white hover:border-[#5C5CFF] transition-all duration-300">
+                  Lihat detail
+                </button>
+              </Link>
             </div>
           ))}
         </div>
