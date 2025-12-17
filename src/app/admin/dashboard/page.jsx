@@ -102,7 +102,8 @@ export default function AdminDashboardPage() {
             { id: 'overview', label: 'Overview', icon: BarChart3 },
             { id: 'users', label: 'Users', icon: Users },
             { id: 'lobbies', label: 'Lobbies', icon: GamepadIcon },
-            { id: 'reports', label: 'Reports', icon: Flag }
+            { id: 'reports', label: 'Reports', icon: Flag },
+            { id: 'analytics', label: 'Analytics', icon: TrendingUp }
           ].map((tab) => (
             <button
               key={tab.id}
@@ -157,7 +158,7 @@ export default function AdminDashboardPage() {
                   </Link>
 
                   <Link
-                    href="/admin/dashboard"
+                    href="/admin/manage-lobbies"
                     className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
                   >
                     <GamepadIcon size={24} className="text-[#5C5CFF] mb-2" />
@@ -166,7 +167,7 @@ export default function AdminDashboardPage() {
                   </Link>
 
                   <Link
-                    href="/admin/dashboard"
+                    href="/admin/handle-reports"
                     className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
                   >
                     <Flag size={24} className="text-[#5C5CFF] mb-2" />
@@ -174,11 +175,14 @@ export default function AdminDashboardPage() {
                     <p className="text-sm text-gray-400">Review and resolve user reports</p>
                   </Link>
 
-                  <div className="p-4 rounded-xl bg-[#1e2230] border border-[#1e2230]">
+                  <Link
+                    href="/admin/analytics"
+                    className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
+                  >
                     <TrendingUp size={24} className="text-[#5C5CFF] mb-2" />
                     <h4 className="font-semibold text-white mb-1">Analytics</h4>
                     <p className="text-sm text-gray-400">View detailed statistics</p>
-                  </div>
+                  </Link>
                 </div>
               </div>
             )}
@@ -198,16 +202,36 @@ export default function AdminDashboardPage() {
             {activeTab === 'lobbies' && (
               <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-6">Lobby Management</h3>
-                <p className="text-gray-400 mb-4">Monitor and manage active lobbies</p>
-                <div className="text-sm text-gray-500">Feature coming soon...</div>
+                <Link
+                  href="/admin/manage-lobbies"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
+                >
+                  Go to Manage Lobbies
+                </Link>
               </div>
             )}
 
             {activeTab === 'reports' && (
               <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-6">Report Management</h3>
-                <p className="text-gray-400 mb-4">Handle user reports and moderation</p>
-                <div className="text-sm text-gray-500">Feature coming soon...</div>
+                <Link
+                  href="/admin/handle-reports"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
+                >
+                  Go to Handle Reports
+                </Link>
+              </div>
+            )}
+
+            {activeTab === 'analytics' && (
+              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-white mb-6">Analytics Dashboard</h3>
+                <Link
+                  href="/admin/analytics"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
+                >
+                  Go to Analytics
+                </Link>
               </div>
             )}
           </div>
