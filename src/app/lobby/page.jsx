@@ -70,7 +70,9 @@ export default function LobbyPage() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [reportLobbyId, setReportLobbyId] = useState(null);
+  const [deleteLobbyId, setDeleteLobbyId] = useState(null);
   const [reportReason, setReportReason] = useState('');
   const [customReason, setCustomReason] = useState('');
   const dropdownRef = useRef(null);
@@ -92,10 +94,20 @@ export default function LobbyPage() {
 
   // Handle delete lobby
   const handleDeleteLobby = (lobbyId) => {
-    // Mock delete - in real app, this would call an API
-    console.log('Deleting lobby:', lobbyId);
-    alert(`Lobby ${lobbyId} telah dihapus`);
+    setDeleteLobbyId(lobbyId);
+    setShowDeleteModal(true);
     setOpenDropdown(null);
+  };
+
+  // Handle confirm delete
+  const handleConfirmDelete = () => {
+    // Mock delete - in real app, this would call an API
+    console.log('Deleting lobby:', deleteLobbyId);
+    alert(`Lobby ${deleteLobbyId} telah dihapus`);
+    
+    // Reset modal
+    setShowDeleteModal(false);
+    setDeleteLobbyId(null);
   };
 
   // Handle report lobby
@@ -365,10 +377,38 @@ export default function LobbyPage() {
         )}
       </main>
 
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#1e2230]/50 rounded-2xl p-6 w-full max-w-sm mx-4 shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-4">Konfirmasi Hapus</h3>
+            <p className="text-gray-400 text-sm mb-6">Apakah Anda yakin untuk menghapus lobby ini?</p>
+            
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowDeleteModal(false);
+                  setDeleteLobbyId(null);
+                }}
+                className="flex-1 py-3 px-4 rounded-xl border border-[#1e2230]/50 bg-transparent/50 backdrop-blur-sm text-gray-400 hover:bg-[#1e2230]/50 transition-colors"
+              >
+                Tidak
+              </button>
+              <button
+                onClick={handleConfirmDelete}
+                className="flex-1 py-3 px-4 rounded-xl bg-red-600/90 backdrop-blur-sm text-white font-bold hover:bg-red-700/90 transition-colors shadow-lg"
+              >
+                Ya
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Report Modal */}
       {showReportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#1e2230]/50 rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
             <h3 className="text-xl font-bold text-white mb-4">Report Lobby</h3>
             <p className="text-gray-400 text-sm mb-6">Pilih alasan untuk melaporkan lobby ini:</p>
             
@@ -394,7 +434,7 @@ export default function LobbyPage() {
                   value={customReason}
                   onChange={(e) => setCustomReason(e.target.value)}
                   placeholder="Jelaskan alasan report..."
-                  className="w-full px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-[#1e2230]/50 bg-[#0F172A]/50 backdrop-blur-sm text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all resize-none"
                   rows={3}
                 />
               </div>
@@ -408,13 +448,13 @@ export default function LobbyPage() {
                   setReportReason('');
                   setCustomReason('');
                 }}
-                className="flex-1 py-3 px-4 rounded-xl border border-[#1e2230] bg-transparent text-gray-400 hover:bg-[#1e2230] transition-colors"
+                className="flex-1 py-3 px-4 rounded-xl border border-[#1e2230]/50 bg-transparent/50 backdrop-blur-sm text-gray-400 hover:bg-[#1e2230]/50 transition-colors"
               >
                 Batal
               </button>
               <button
                 onClick={handleSubmitReport}
-                className="flex-1 py-3 px-4 rounded-xl bg-[#5C5CFF] text-white font-bold hover:bg-[#4a4ae0] transition-colors"
+                className="flex-1 py-3 px-4 rounded-xl bg-[#5C5CFF]/90 backdrop-blur-sm text-white font-bold hover:bg-[#4a4ae0]/90 transition-colors shadow-lg"
               >
                 Kirim Report
               </button>
