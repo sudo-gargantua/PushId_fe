@@ -75,6 +75,9 @@ export default function LobbyPage() {
   const [deleteLobbyId, setDeleteLobbyId] = useState(null);
   const [reportReason, setReportReason] = useState('');
   const [customReason, setCustomReason] = useState('');
+  const [showNotificationDetail, setShowNotificationDetail] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [readNotifications, setReadNotifications] = useState(new Set());
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -141,6 +144,37 @@ export default function LobbyPage() {
     setCustomReason('');
   };
 
+  // Handle notification click
+  const handleNotificationClick = (notification) => {
+    setSelectedNotification(notification);
+    setShowNotificationDetail(true);
+    setShowNotifications(false);
+    // Mark as read
+    setReadNotifications(prev => new Set([...prev, notification.id]));
+  };
+
+  // Handle delete notification
+  const handleDeleteNotification = (notificationId, e) => {
+    e.stopPropagation(); // Prevent triggering notification click
+    if (confirm('Apakah Anda yakin ingin menghapus notifikasi ini?')) {
+      console.log('Deleting notification:', notificationId);
+      // In real app, this would call an API
+      alert('Notifikasi telah dihapus');
+    }
+  };
+
+  // Handle mark all notifications as read
+  const handleMarkAllAsRead = () => {
+    const allIds = notifications.map(n => n.id);
+    setReadNotifications(new Set(allIds));
+    alert('Semua notifikasi telah ditandai sebagai sudah dibaca');
+  };
+
+  // Get unread count
+  const getUnreadCount = () => {
+    return notifications.filter(n => !readNotifications.has(n.id)).length;
+  };
+
   // Report reasons
   const reportReasons = [
     { value: 'spam', label: 'Spam atau iklan tidak diinginkan' },
@@ -152,10 +186,38 @@ export default function LobbyPage() {
 
   // Mock notifications
   const notifications = [
-    { id: 1, type: 'admin', message: 'Server maintenance scheduled for tonight at 10 PM', time: '2h ago' },
-    { id: 2, type: 'system', message: 'New lobby "Epic Battle" has been created', time: '1h ago' },
-    { id: 3, type: 'admin', message: 'Update: New game modes available in HOK', time: '30m ago' },
-    { id: 4, type: 'system', message: 'Your lobby "Push Rank" is now active', time: '15m ago' }
+    {
+      id: 1,
+      type: 'admin',
+      message: 'Server maintenance scheduled for tonight at 10 PM',
+      time: '2h ago',
+      details: 'We will be performing scheduled maintenance on our servers tonight from 10 PM to 2 AM. During this time, the platform may be temporarily unavailable. We apologize for any inconvenience this may cause.',
+      priority: 'high'
+    },
+    {
+      id: 2,
+      type: 'system',
+      message: 'New lobby "Epic Battle" has been created',
+      time: '1h ago',
+      details: 'A new lobby titled "Epic Battle" has been successfully created in the HOK category. Check it out and join the action!',
+      priority: 'normal'
+    },
+    {
+      id: 3,
+      type: 'admin',
+      message: 'Update: New game modes available in HOK',
+      time: '30m ago',
+      details: 'We\'ve added exciting new game modes to Honor of Kings! Try out the new "Ranked Duo" and "Team Deathmatch" modes. These modes offer fresh gameplay experiences and new rewards.',
+      priority: 'normal'
+    },
+    {
+      id: 4,
+      type: 'system',
+      message: 'Your lobby "Push Rank" is now active',
+      time: '15m ago',
+      details: 'Great news! Your lobby "Push Rank" is now live and active. Other players can now see and join your lobby. Good luck with your ranking push!',
+      priority: 'normal'
+    }
   ];
 
   // Function to get relative time
@@ -216,9 +278,9 @@ export default function LobbyPage() {
                 className="w-12 h-12 rounded-full border-2 border-[#5C5CFF] flex items-center justify-center cursor-pointer hover:bg-[#5C5CFF]/20 transition group relative"
               >
                 <Bell size={24} className="text-[#5C5CFF] group-hover:text-white transition" />
-                {notifications.length > 0 && (
+                {getUnreadCount() > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                    {notifications.length}
+                    {getUnreadCount()}
                   </span>
                 )}
               </button>
@@ -227,17 +289,42 @@ export default function LobbyPage() {
               {showNotifications && (
                 <div className="absolute top-14 right-0 w-80 bg-[#0F172A] border border-[#1e2230] rounded-xl shadow-2xl z-50 max-h-96 overflow-y-auto">
                   <div className="p-4 border-b border-[#1e2230]">
-                    <h3 className="text-lg font-bold text-white">Notifications</h3>
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-bold text-white">Notifications</h3>
+                      {getUnreadCount() > 0 && (
+                        <button
+                          onClick={handleMarkAllAsRead}
+                          className="text-sm text-[#5C5CFF] hover:text-[#4a4ae0] transition-colors"
+                        >
+                          Mark all read
+                        </button>
+                      )}
+                    </div>
                   </div>
                   <div className="p-2">
                     {notifications.map((notif) => (
-                      <div key={notif.id} className="p-3 border-b border-[#1e2230] last:border-b-0 hover:bg-[#1e2230] transition">
+                      <div
+                        key={notif.id}
+                        onClick={() => handleNotificationClick(notif)}
+                        className={`p-3 border-b border-[#1e2230] last:border-b-0 hover:bg-[#1e2230] transition cursor-pointer group ${
+                          readNotifications.has(notif.id) ? 'opacity-60' : ''
+                        }`}
+                      >
                         <div className="flex items-start gap-3">
                           <div className={`w-2 h-2 rounded-full mt-2 ${notif.type === 'admin' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
                           <div className="flex-1">
                             <p className="text-sm text-gray-300">{notif.message}</p>
                             <p className="text-xs text-gray-500 mt-1">{notif.time}</p>
                           </div>
+                          <button
+                            onClick={(e) => handleDeleteNotification(notif.id, e)}
+                            className="opacity-0 group-hover:opacity-100 p-1 rounded-full hover:bg-red-600/20 text-red-400 hover:text-red-300 transition-all"
+                            title="Delete notification"
+                          >
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M18 6L6 18M6 6l12 12"/>
+                            </svg>
+                          </button>
                         </div>
                       </div>
                     ))}
@@ -457,6 +544,86 @@ export default function LobbyPage() {
                 className="flex-1 py-3 px-4 rounded-xl bg-[#5C5CFF]/90 backdrop-blur-sm text-white font-bold hover:bg-[#4a4ae0]/90 transition-colors shadow-lg"
               >
                 Kirim Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Detail Modal */}
+      {showNotificationDetail && selectedNotification && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#0F172A]/90 backdrop-blur-md border border-[#1e2230]/50 rounded-2xl p-6 w-full max-w-md mx-4 shadow-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-white">Notification Detail</h3>
+              <button
+                onClick={() => {
+                  setShowNotificationDetail(false);
+                  setSelectedNotification(null);
+                }}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-3">
+                <div className={`w-3 h-3 rounded-full ${selectedNotification.type === 'admin' ? 'bg-red-500' : 'bg-blue-500'}`}></div>
+                <span className="text-sm font-bold text-gray-300 uppercase">
+                  {selectedNotification.type === 'admin' ? 'Admin' : 'System'}
+                </span>
+                <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                  selectedNotification.priority === 'high' ? 'bg-red-900/50 text-red-300' : 'bg-gray-900/50 text-gray-300'
+                }`}>
+                  {selectedNotification.priority === 'high' ? 'High Priority' : 'Normal'}
+                </span>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-bold text-white mb-2">Message</h4>
+                <p className="text-gray-300 leading-relaxed">{selectedNotification.message}</p>
+              </div>
+
+              {selectedNotification.details && (
+                <div>
+                  <h4 className="text-lg font-bold text-white mb-2">Details</h4>
+                  <p className="text-gray-400 leading-relaxed text-sm">{selectedNotification.details}</p>
+                </div>
+              )}
+
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </svg>
+                <span>{selectedNotification.time}</span>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>From: {selectedNotification.type === 'admin' ? 'Administrator' : 'System'}</span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setShowNotificationDetail(false);
+                  setSelectedNotification(null);
+                }}
+                className="flex-1 py-3 px-4 rounded-xl border border-[#1e2230]/50 bg-transparent/50 backdrop-blur-sm text-gray-400 hover:bg-[#1e2230]/50 transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => handleDeleteNotification(selectedNotification.id, { stopPropagation: () => {} })}
+                className="px-4 py-3 rounded-xl bg-red-600/90 backdrop-blur-sm text-white font-bold hover:bg-red-700/90 transition-colors shadow-lg"
+              >
+                Delete
               </button>
             </div>
           </div>
