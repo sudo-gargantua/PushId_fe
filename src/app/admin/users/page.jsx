@@ -102,9 +102,6 @@ export default function AdminUsersPage() {
       case 'unban':
         alert(`User ${user.name} telah diunban (Mock)`);
         break;
-      case 'promote':
-        alert(`User ${user.name} telah dipromosikan ke admin (Mock)`);
-        break;
       case 'demote':
         alert(`User ${user.name} telah diturunkan ke user biasa (Mock)`);
         break;
@@ -267,16 +264,6 @@ export default function AdminUsersPage() {
                                 >
                                   <UserX size={14} />
                                   Ban User
-                                </button>
-                              )}
-
-                              {user.role !== 'admin' && (
-                                <button
-                                  onClick={() => handleUserAction(user.id, 'promote')}
-                                  className="w-full px-4 py-2 text-left text-sm text-purple-400 hover:bg-[#1e2230] flex items-center gap-2 transition-colors"
-                                >
-                                  <Shield size={14} />
-                                  Promote to Admin
                                 </button>
                               )}
 

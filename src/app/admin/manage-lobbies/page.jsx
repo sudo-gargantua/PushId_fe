@@ -1,8 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, Filter, Eye, Edit, Trash2, Users, Clock, AlertTriangle } from 'lucide-react';
-import Link from 'next/link';
+import { Search, Filter, Trash2, Users, Clock, AlertTriangle } from 'lucide-react';
 
 const MOCK_LOBBIES = [
   {
@@ -182,24 +181,12 @@ export default function ManageLobbiesPage() {
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <Link href={`/admin/manage-lobbies/${lobby.id}`}>
-                        <button className="p-2 rounded-lg bg-blue-600/20 text-blue-400 hover:bg-blue-600/30 transition-colors">
-                          <Eye size={16} />
-                        </button>
-                      </Link>
-                      <Link href={`/admin/manage-lobbies/${lobby.id}/edit`}>
-                        <button className="p-2 rounded-lg bg-yellow-600/20 text-yellow-400 hover:bg-yellow-600/30 transition-colors">
-                          <Edit size={16} />
-                        </button>
-                      </Link>
-                      <button
-                        onClick={() => handleDeleteLobby(lobby.id)}
-                        className="p-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
+                    <button
+                      onClick={() => handleDeleteLobby(lobby.id)}
+                      className="p-2 rounded-lg bg-red-600/20 text-red-400 hover:bg-red-600/30 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                    </button>
                   </td>
                 </tr>
               ))}
