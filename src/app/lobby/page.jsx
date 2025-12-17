@@ -1,7 +1,7 @@
 'use client'; 
 
 import React, { useState, useEffect, useRef } from 'react';
-import { User, Bell } from 'lucide-react';
+import { User, Bell, MoreVertical, Trash2, Flag } from 'lucide-react';
 import Link from 'next/link';
 
 // Data Mockup
@@ -68,6 +68,7 @@ export default function LobbyPage() {
   const [activeCategory, setActiveCategory] = useState('ALL');
   const [searchTerm, setSearchTerm] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState(null);
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -76,10 +77,30 @@ export default function LobbyPage() {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
+      // Close lobby dropdown if clicking outside
+      if (openDropdown && !event.target.closest('.lobby-dropdown')) {
+        setOpenDropdown(null);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [openDropdown]);
+
+  // Handle delete lobby
+  const handleDeleteLobby = (lobbyId) => {
+    // Mock delete - in real app, this would call an API
+    console.log('Deleting lobby:', lobbyId);
+    alert(`Lobby ${lobbyId} telah dihapus`);
+    setOpenDropdown(null);
+  };
+
+  // Handle report lobby
+  const handleReportLobby = (lobbyId) => {
+    // Mock report - in real app, this would call an API
+    console.log('Reporting lobby:', lobbyId);
+    alert(`Lobby ${lobbyId} telah dilaporkan`);
+    setOpenDropdown(null);
+  };
 
   // Mock notifications
   const notifications = [
@@ -237,12 +258,42 @@ export default function LobbyPage() {
               className="bg-[#0F172A] border border-[#1e2230] rounded-3xl p-6 hover:border-[#5C5CFF] hover:shadow-[0_0_20px_rgba(92,92,255,0.15)] transition-all duration-300 group flex flex-col justify-between h-full"
             >
               <div>
-                {/* Header Card: Tag & Time */}
+                {/* Header Card: Tag & Time & Menu */}
                 <div className="flex justify-between items-start mb-4">
                     <span className={`px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider ${item.tagColor} bg-opacity-20`}>
                     {item.game}
                     </span>
-                    <span className="text-xs text-gray-500 font-medium">{getRelativeTime(item.createdAt)}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500 font-medium">{getRelativeTime(item.createdAt)}</span>
+                      <div className="relative lobby-dropdown">
+                        <button
+                          onClick={() => setOpenDropdown(openDropdown === item.id ? null : item.id)}
+                          className="p-1 rounded-full hover:bg-[#1e2230] transition-colors"
+                        >
+                          <MoreVertical size={16} className="text-gray-400 hover:text-white" />
+                        </button>
+                        {openDropdown === item.id && (
+                          <div className="absolute top-8 right-0 w-48 bg-[#0F172A] border border-[#1e2230] rounded-xl shadow-2xl z-50">
+                            <div className="py-2">
+                              <button
+                                onClick={() => handleDeleteLobby(item.id)}
+                                className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-[#1e2230] flex items-center gap-2 transition-colors"
+                              >
+                                <Trash2 size={14} />
+                                Hapus Lobby
+                              </button>
+                              <button
+                                onClick={() => handleReportLobby(item.id)}
+                                className="w-full px-4 py-2 text-left text-sm text-yellow-400 hover:bg-[#1e2230] flex items-center gap-2 transition-colors"
+                              >
+                                <Flag size={14} />
+                                Report Lobby
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                 </div>
 
                 {/* Title */}
