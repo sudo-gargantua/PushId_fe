@@ -135,7 +135,7 @@ export default function AdminUsersPage() {
       <header className="bg-[#0F172A] border-b border-[#1e2230] px-6 py-4">
         <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-4">
-            <Link href="/admin/dashboard" className="text-gray-400 hover:text-white transition-colors">
+            <Link href="/admin" className="text-gray-400 hover:text-white transition-colors">
               <ArrowLeft size={24} />
             </Link>
             <Shield size={32} className="text-[#5C5CFF]" />
