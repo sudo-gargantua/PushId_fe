@@ -69,6 +69,10 @@ export default function LobbyPage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [showNotifications, setShowNotifications] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [reportLobbyId, setReportLobbyId] = useState(null);
+  const [reportReason, setReportReason] = useState('');
+  const [customReason, setCustomReason] = useState('');
   const dropdownRef = useRef(null);
 
   // Close dropdown when clicking outside
@@ -96,11 +100,43 @@ export default function LobbyPage() {
 
   // Handle report lobby
   const handleReportLobby = (lobbyId) => {
-    // Mock report - in real app, this would call an API
-    console.log('Reporting lobby:', lobbyId);
-    alert(`Lobby ${lobbyId} telah dilaporkan`);
+    setReportLobbyId(lobbyId);
+    setShowReportModal(true);
     setOpenDropdown(null);
   };
+
+  // Handle submit report
+  const handleSubmitReport = () => {
+    if (!reportReason) {
+      alert('Silakan pilih alasan report');
+      return;
+    }
+    
+    const finalReason = reportReason === 'other' ? customReason : reportReason;
+    if (reportReason === 'other' && !finalReason.trim()) {
+      alert('Silakan isi alasan report lainnya');
+      return;
+    }
+
+    // Mock submit report - in real app, this would call an API
+    console.log('Reporting lobby:', reportLobbyId, 'Reason:', finalReason);
+    alert(`Lobby ${reportLobbyId} telah dilaporkan dengan alasan: ${finalReason}`);
+    
+    // Reset modal
+    setShowReportModal(false);
+    setReportLobbyId(null);
+    setReportReason('');
+    setCustomReason('');
+  };
+
+  // Report reasons
+  const reportReasons = [
+    { value: 'spam', label: 'Spam atau iklan tidak diinginkan' },
+    { value: 'harassment', label: 'Perundungan atau pelecehan' },
+    { value: 'inappropriate', label: 'Konten tidak pantas' },
+    { value: 'scam', label: 'Penipuan atau scam' },
+    { value: 'other', label: 'Lainnya' }
+  ];
 
   // Mock notifications
   const notifications = [
@@ -328,6 +364,64 @@ export default function LobbyPage() {
           </div>
         )}
       </main>
+
+      {/* Report Modal */}
+      {showReportModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 w-full max-w-md mx-4">
+            <h3 className="text-xl font-bold text-white mb-4">Report Lobby</h3>
+            <p className="text-gray-400 text-sm mb-6">Pilih alasan untuk melaporkan lobby ini:</p>
+            
+            <div className="space-y-3 mb-6">
+              {reportReasons.map((reason) => (
+                <label key={reason.value} className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    name="reportReason"
+                    value={reason.value}
+                    checked={reportReason === reason.value}
+                    onChange={(e) => setReportReason(e.target.value)}
+                    className="w-4 h-4 text-[#5C5CFF] bg-[#0F172A] border-[#1e2230] focus:ring-[#5C5CFF] focus:ring-2"
+                  />
+                  <span className="text-gray-300 text-sm">{reason.label}</span>
+                </label>
+              ))}
+            </div>
+
+            {reportReason === 'other' && (
+              <div className="mb-6">
+                <textarea
+                  value={customReason}
+                  onChange={(e) => setCustomReason(e.target.value)}
+                  placeholder="Jelaskan alasan report..."
+                  className="w-full px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all resize-none"
+                  rows={3}
+                />
+              </div>
+            )}
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowReportModal(false);
+                  setReportLobbyId(null);
+                  setReportReason('');
+                  setCustomReason('');
+                }}
+                className="flex-1 py-3 px-4 rounded-xl border border-[#1e2230] bg-transparent text-gray-400 hover:bg-[#1e2230] transition-colors"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleSubmitReport}
+                className="flex-1 py-3 px-4 rounded-xl bg-[#5C5CFF] text-white font-bold hover:bg-[#4a4ae0] transition-colors"
+              >
+                Kirim Report
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
