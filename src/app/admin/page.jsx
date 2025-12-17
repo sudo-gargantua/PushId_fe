@@ -8,7 +8,6 @@ import {
   Flag,
   TrendingUp,
   Activity,
-  LogOut,
   Settings,
   Shield
 } from 'lucide-react';
@@ -61,12 +60,6 @@ const RECENT_ACTIVITIES = [
 export default function AdminDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview');
 
-  const handleLogout = () => {
-    // Mock logout
-    alert('Logout berhasil! (Mock)');
-    // Redirect to login would happen here
-  };
-
   return (
     <div className="min-h-screen bg-[#020617] text-white font-sans">
       {/* Header */}
@@ -83,13 +76,6 @@ export default function AdminDashboardPage() {
           <div className="flex items-center gap-4">
             <button className="p-2 rounded-lg hover:bg-[#1e2230] transition-colors">
               <Settings size={20} className="text-gray-400" />
-            </button>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 transition-colors"
-            >
-              <LogOut size={16} />
-              Logout
             </button>
           </div>
         </div>
