@@ -12,6 +12,10 @@ import {
   Shield
 } from 'lucide-react';
 import Link from 'next/link';
+import UsersManagement from '@/components/admin/UsersManagement';
+import LobbiesManagement from '@/components/admin/LobbiesManagement';
+import ReportsManagement from '@/components/admin/ReportsManagement';
+import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 
 // Mock data for dashboard
 const DASHBOARD_STATS = [
@@ -73,11 +77,7 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button className="p-2 rounded-lg hover:bg-[#1e2230] transition-colors">
-              <Settings size={20} className="text-gray-400" />
-            </button>
-          </div>
+          {/* Settings button removed */}
         </div>
       </header>
 
@@ -94,11 +94,10 @@ export default function AdminDashboardPage() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-[#5C5CFF] text-[#5C5CFF]'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
+              className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-colors ${activeTab === tab.id
+                ? 'border-[#5C5CFF] text-[#5C5CFF]'
+                : 'border-transparent text-gray-400 hover:text-white'
+                }`}
             >
               <tab.icon size={18} />
               {tab.label}
@@ -115,9 +114,8 @@ export default function AdminDashboardPage() {
             >
               <div className="flex items-center justify-between mb-4">
                 <stat.icon size={24} className={stat.color} />
-                <span className={`text-sm font-medium ${
-                  stat.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
-                }`}>
+                <span className={`text-sm font-medium ${stat.changeType === 'positive' ? 'text-green-400' : 'text-red-400'
+                  }`}>
                   {stat.change}
                 </span>
               </div>
@@ -127,122 +125,84 @@ export default function AdminDashboardPage() {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2">
-            {activeTab === 'overview' && (
-              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-6">Quick Actions</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <Link
-                    href="/admin/users"
-                    className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
-                  >
-                    <Users size={24} className="text-[#5C5CFF] mb-2" />
-                    <h4 className="font-semibold text-white mb-1">Manage Users</h4>
-                    <p className="text-sm text-gray-400">View and manage user accounts</p>
-                  </Link>
+        {/* Content Area */}
+        <div className="w-full">
+          {activeTab === 'users' && <UsersManagement />}
 
-                  <Link
-                    href="/admin/manage-lobbies"
-                    className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
-                  >
-                    <GamepadIcon size={24} className="text-[#5C5CFF] mb-2" />
-                    <h4 className="font-semibold text-white mb-1">Manage Lobbies</h4>
-                    <p className="text-sm text-gray-400">Monitor and moderate lobbies</p>
-                  </Link>
+          {activeTab === 'lobbies' && <LobbiesManagement />}
 
-                  <Link
-                    href="/admin/handle-reports"
-                    className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
-                  >
-                    <Flag size={24} className="text-[#5C5CFF] mb-2" />
-                    <h4 className="font-semibold text-white mb-1">Handle Reports</h4>
-                    <p className="text-sm text-gray-400">Review and resolve user reports</p>
-                  </Link>
+          {activeTab === 'reports' && <ReportsManagement />}
 
-                  <Link
-                    href="/admin/analytics"
-                    className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50"
-                  >
-                    <TrendingUp size={24} className="text-[#5C5CFF] mb-2" />
-                    <h4 className="font-semibold text-white mb-1">Analytics</h4>
-                    <p className="text-sm text-gray-400">View detailed statistics</p>
-                  </Link>
-                </div>
-              </div>
-            )}
+          {activeTab === 'analytics' && <AnalyticsDashboard />}
 
-            {activeTab === 'users' && (
-              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-6">User Management</h3>
-                <Link
-                  href="/admin/users"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
-                >
-                  Go to Users Page
-                </Link>
-              </div>
-            )}
+          {activeTab === 'overview' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Main Content */}
+              <div className="lg:col-span-2">
+                <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
+                  <h3 className="text-lg font-bold text-white mb-6">Quick Actions</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <button
+                      onClick={() => setActiveTab('users')}
+                      className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50 text-left"
+                    >
+                      <Users size={24} className="text-[#5C5CFF] mb-2" />
+                      <h4 className="font-semibold text-white mb-1">Manage Users</h4>
+                      <p className="text-sm text-gray-400">View and manage user accounts</p>
+                    </button>
 
-            {activeTab === 'lobbies' && (
-              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-6">Lobby Management</h3>
-                <Link
-                  href="/admin/manage-lobbies"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
-                >
-                  Go to Manage Lobbies
-                </Link>
-              </div>
-            )}
+                    <button
+                      onClick={() => setActiveTab('lobbies')}
+                      className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50 text-left"
+                    >
+                      <GamepadIcon size={24} className="text-[#5C5CFF] mb-2" />
+                      <h4 className="font-semibold text-white mb-1">Manage Lobbies</h4>
+                      <p className="text-sm text-gray-400">Monitor and moderate lobbies</p>
+                    </button>
 
-            {activeTab === 'reports' && (
-              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-6">Report Management</h3>
-                <Link
-                  href="/admin/handle-reports"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
-                >
-                  Go to Handle Reports
-                </Link>
-              </div>
-            )}
+                    <button
+                      onClick={() => setActiveTab('reports')}
+                      className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50 text-left"
+                    >
+                      <Flag size={24} className="text-[#5C5CFF] mb-2" />
+                      <h4 className="font-semibold text-white mb-1">Handle Reports</h4>
+                      <p className="text-sm text-gray-400">Review and resolve user reports</p>
+                    </button>
 
-            {activeTab === 'analytics' && (
-              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
-                <h3 className="text-lg font-bold text-white mb-6">Analytics Dashboard</h3>
-                <Link
-                  href="/admin/analytics"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-[#5C5CFF] text-white font-bold rounded-xl hover:bg-[#4a4ae0] transition-colors"
-                >
-                  Go to Analytics
-                </Link>
-              </div>
-            )}
-          </div>
-
-          {/* Sidebar - Recent Activities */}
-          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
-            <h3 className="text-lg font-bold text-white mb-6">Recent Activities</h3>
-            <div className="space-y-4">
-              {RECENT_ACTIVITIES.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-[#1e2230] last:border-b-0 last:pb-0">
-                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                    activity.type === 'warning' ? 'bg-red-500' :
-                    activity.type === 'success' ? 'bg-green-500' :
-                    activity.type === 'system' ? 'bg-blue-500' : 'bg-gray-500'
-                  }`}></div>
-                  <div className="flex-1">
-                    <p className="text-sm text-gray-300">{activity.action}</p>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {activity.user} • {activity.time}
-                    </p>
+                    <button
+                      onClick={() => setActiveTab('analytics')}
+                      className="p-4 rounded-xl bg-[#1e2230] hover:bg-[#2a2f42] transition-colors border border-[#1e2230] hover:border-[#5C5CFF]/50 text-left"
+                    >
+                      <TrendingUp size={24} className="text-[#5C5CFF] mb-2" />
+                      <h4 className="font-semibold text-white mb-1">Analytics</h4>
+                      <p className="text-sm text-gray-400">View detailed statistics</p>
+                    </button>
                   </div>
                 </div>
-              ))}
+              </div>
+
+              {/* Sidebar - Recent Activities */}
+              <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6">
+                <h3 className="text-lg font-bold text-white mb-6">Recent Activities</h3>
+                <div className="space-y-4">
+                  {RECENT_ACTIVITIES.map((activity) => (
+                    <div key={activity.id} className="flex items-start gap-3 pb-4 border-b border-[#1e2230] last:border-b-0 last:pb-0">
+                      <div className={`w-2 h-2 rounded-full mt-2 ${activity.type === 'warning' ? 'bg-red-500' :
+                        activity.type === 'success' ? 'bg-green-500' :
+                          activity.type === 'system' ? 'bg-blue-500' : 'bg-gray-500'
+                        }`}></div>
+                      <div className="flex-1">
+                        <p className="text-sm text-gray-300">{activity.action}</p>
+                        <p className="text-xs text-gray-500 mt-1">
+                          {activity.user} • {activity.time}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </div>
