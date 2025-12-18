@@ -2,27 +2,28 @@
 
 import React, { useState } from 'react';
 import { Eye, EyeOff, CheckSquare, Square, Loader2, Apple } from 'lucide-react';
-// import { useRouter } from 'next/navigation'; // Aktifkan jika sudah di Next.js asli
+// IMPORT TOAST
+import toast, { Toaster } from 'react-hot-toast';
+// PERBAIKAN: Path relatif yang benar ke store yang baru saja dibuat di atas
+import { useAuthStore } from '../../store/useAuthStore';
 
 export default function RegisterPage() {
-  // const router = useRouter(); 
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // State Data Input
+  const loginToStore = useAuthStore((state) => state.login);
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: ''
   });
 
-  // State untuk Error Validasi dari Laravel
   const [errors, setErrors] = useState({});
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    // Hapus error saat user mengetik ulang
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: null });
     }
@@ -30,48 +31,74 @@ export default function RegisterPage() {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setErrors({}); // Reset error
+    setErrors({});
 
     if (!agreeTerms) {
-      alert("Kamu harus menyetujui Syarat & Ketentuan.");
+      toast.error("Kamu harus menyetujui Syarat & Ketentuan.", {
+        style: { background: '#1e293b', color: '#fff', border: '1px solid #ef4444' }
+      });
       return;
     }
 
     setIsLoading(true);
+    const loadingToast = toast.loading("Mendaftarkan akun...", {
+        style: { background: '#1e293b', color: '#fff' }
+    });
 
     try {
-      // --- KONEKSI KE LARAVEL ---
-      // Pastikan Laravel sudah jalan: php artisan serve
-      // Ganti URL ini dengan URL API Laravel kamu
+      // GANTI URL INI DENGAN API LARAVEL KAMU
       const response = await fetch('http://localhost:8000/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json', // Penting agar Laravel membalas JSON, bukan HTML
+          'Accept': 'application/json',
         },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
 
+      // Hapus loading toast
+      toast.dismiss(loadingToast);
+
       if (response.ok) {
-        // --- SUKSES ---
-        alert("Registrasi Berhasil! Silakan Login.");
-        window.location.href = '/login'; // Redirect manual
-        // router.push('/login'); // Gunakan ini di project asli
+        if (data.user && data.token) {
+             loginToStore(data.user, data.token);
+             toast.success(`Selamat datang, ${data.user.name}!`, {
+                duration: 2000,
+                style: { background: '#1e293b', color: '#fff', border: '1px solid #5C5CFF' }
+             });
+             
+             setTimeout(() => {
+                window.location.href = '/lobby';
+             }, 1500);
+        } else {
+             toast.success("Registrasi Berhasil! Silakan Login.", {
+                style: { background: '#1e293b', color: '#fff' }
+             });
+             setTimeout(() => {
+                window.location.href = '/login';
+             }, 1500);
+        }
       } else {
-        // --- GAGAL (Validasi Laravel) ---
-        // Laravel biasanya mengirim format: { message: "...", errors: { email: ["..."] } }
         if (data.errors) {
           setErrors(data.errors);
+          toast.error("Periksa kembali data inputan Anda.", {
+            style: { background: '#1e293b', color: '#fff' }
+          });
         } else {
-          alert(data.message || "Registrasi Gagal.");
+          toast.error(data.message || "Registrasi Gagal.", {
+            style: { background: '#1e293b', color: '#fff' }
+          });
         }
       }
 
     } catch (error) {
       console.error("Error:", error);
-      alert("Gagal terhubung ke Server Backend. Pastikan Laravel sudah jalan.");
+      toast.dismiss(loadingToast);
+      toast.error("Gagal terhubung ke Server Backend.", {
+        style: { background: '#1e293b', color: '#fff' }
+      });
     } finally {
       setIsLoading(false);
     }
@@ -79,24 +106,26 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen w-full flex bg-[#020617] text-white font-sans overflow-hidden">
+      <Toaster position="top-center" reverseOrder={false} />
       
-      {/* BAGIAN KIRI: GAMBAR */}
       <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center bg-[#0B0E14] overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="/login-register.jpg" 
+            src="login-register.jpg" 
             alt="Register Character" 
             className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-10000 ease-linear"
+            onError={(e) => {
+              e.target.style.display = 'none'; 
+              e.target.parentNode.style.backgroundColor = '#1e293b'; 
+            }}
           />
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#020617]/10 to-[#020617] z-10"></div>
         </div>
       </div>
 
-      {/* BAGIAN KANAN: FORM */}
       <div className="w-full lg:w-[45%] flex flex-col justify-center items-center px-6 py-12 bg-[#020617] relative z-20 h-full overflow-y-auto">
         <div className="w-full max-w-[420px] space-y-6">
           
-          {/* HEADER */}
           <div className="flex flex-col items-center mb-8">
             <div className="flex flex-col items-center gap-2 mb-2">
                 <div className="relative">
@@ -108,7 +137,6 @@ export default function RegisterPage() {
             <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide text-center mt-2">Create your Account</h2>
           </div>
 
-          {/* TABS */}
           <div className="flex gap-8 mb-6 text-lg font-semibold pl-1">
             <a href="/login" className="text-slate-500 hover:text-slate-300 transition-colors">Login</a>
             <button className="text-blue-500 transition-colors relative">
@@ -117,10 +145,7 @@ export default function RegisterPage() {
             </button>
           </div>
 
-          {/* FORM */}
           <form className="space-y-4" onSubmit={handleRegister}>
-            
-            {/* Input Name */}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Your name</label>
               <input 
@@ -134,7 +159,6 @@ export default function RegisterPage() {
               {errors.name && <p className="text-red-500 text-xs ml-1">{errors.name[0]}</p>}
             </div>
 
-            {/* Input Email */}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
               <input 
@@ -145,11 +169,9 @@ export default function RegisterPage() {
                 onChange={handleChange}
                 required
               />
-              {/* Tampilkan Error Email jika ada (misal: Email already taken) */}
               {errors.email && <p className="text-red-500 text-xs ml-1">{errors.email[0]}</p>}
             </div>
 
-            {/* Input Password */}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
               <div className="relative">
@@ -186,13 +208,11 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          {/* Social Buttons */}
           <div className="relative flex py-2 items-center"><div className="flex-grow border-t border-slate-800"></div><span className="flex-shrink mx-4 text-slate-600 text-[10px] font-bold uppercase tracking-widest">OR</span><div className="flex-grow border-t border-slate-800"></div></div>
           <div className="space-y-3">
             <button className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold py-3 rounded-xl flex items-center justify-center gap-3 transition-all text-sm">
                Continue With Google
             </button>
-
              <button className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 hover:border-slate-600 text-slate-300 font-semibold py-3 rounded-xl flex items-center justify-center gap-3 transition-all group text-sm">
               <Apple size={18} className="text-white pb-0.5 group-hover:scale-110 transition-transform" />
               Continue With Apple
