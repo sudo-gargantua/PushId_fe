@@ -1,12 +1,23 @@
 "use client";
 import React, { useState } from 'react';
-import { User, Gamepad2, Menu, X } from 'lucide-react';
+import { User, Gamepad2, Menu, X, LogOut } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useAuthStore } from '@/store/useAuthStore';
 
 const App = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+
+  const { user, isLoggedIn, logout } = useAuthStore();
+
+  const handleLogout = (e) => {
+    e.preventDefault(); // Mencegah navigasi Link
+    if (confirm("Apakah Anda yakin ingin keluar?")) {
+      logout(); 
+      router.push('/login');
+    }
+  };
 
   // --- DATA ---
   
@@ -91,12 +102,29 @@ const App = () => {
       </div>
 
       {/* User Profile */}
-      <Link href="/login" className="hidden md:flex items-center justify-end gap-4 w-[200px] cursor-pointer">
-        <span className="font-bold text-gray-200 hover:text-white tracking-wide text-lg transition-colors">Hello Users</span>
-        <div className="w-11 h-11 rounded-full border-2 border-[#6366f1] hover:border-[#818cf8] flex items-center justify-center bg-[#6366f1]/20 hover:bg-[#6366f1]/40 text-[#6366f1] hover:text-[#818cf8] shadow-[0_0_10px_rgba(99,102,241,0.3)] hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all">
-          <User size={22} strokeWidth={2.5} />
-        </div>
-      </Link>
+      <div className="hidden md:flex items-center justify-end gap-4 w-[240px]">
+        <Link href={isLoggedIn ? "/lobby" : "/login"} className="flex items-center gap-4 cursor-pointer group">
+          {/* Mengubah Hello Users menjadi Nama User Dinamis */}
+          <span className="font-bold text-gray-200 group-hover:text-white tracking-wide text-sm transition-colors">
+            Hello {isLoggedIn && user ? user.name : 'User'}
+          </span>
+
+          <div className="w-11 h-11 rounded-full border-2 border-[#6366f1] hover:border-[#818cf8] flex items-center justify-center bg-[#6366f1]/20 hover:bg-[#6366f1]/40 text-[#6366f1] hover:text-[#818cf8] shadow-[0_0_10px_rgba(99,102,241,0.3)] hover:shadow-[0_0_15px_rgba(99,102,241,0.5)] transition-all">
+            <User size={22} strokeWidth={2.5} />
+          </div>
+        </Link>
+
+        {/* Menambahkan Tombol Logout jika User sudah login */}
+        {isLoggedIn && (
+          <button 
+            onClick={handleLogout}
+            className="ml-2 p-2 rounded-lg bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all"
+            title="Logout"
+          >
+            <LogOut size={18} />
+          </button>
+        )}
+      </div>      
 
       {/* Mobile Toggle */}
       <button className="md:hidden text-white ml-auto" onClick={() => setIsMenuOpen(!isMenuOpen)}>
