@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, CheckSquare, Square, Loader2, Apple } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
-// PERBAIKAN: Menggunakan path relatif ke store yang PASTI sudah dibuat di atas
+// import Link from 'next/link'; // Gunakan ini di project asli
 import { useAuthStore } from '../../store/useAuthStore';
 
 export default function LoginPage() {
@@ -11,77 +11,86 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Mengambil fungsi login dari store Zustand
   const loginToStore = useAuthStore((state) => state.login);
 
   const [formData, setFormData] = useState({
     email: '',
-    password: ''
+    password: '',
   });
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: e.target.value,
+    }));
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    if (isLoading) return;
+
     setIsLoading(true);
-    
-    const loadingToast = toast.loading("Sedang memverifikasi...", {
-        style: { background: '#1e293b', color: '#fff' }
+
+    const loadingToast = toast.loading('Sedang memverifikasi...', {
+      style: { background: '#1e293b', color: '#fff' },
     });
 
     try {
-      // --- KONEKSI KE LARAVEL (Login API) ---
+      // API Login Laravel
       const response = await fetch('http://localhost:8000/api/login', {
         method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
-            'Accept': 'application/json' 
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
         },
         body: JSON.stringify(formData),
       });
 
       const data = await response.json();
-      toast.dismiss(loadingToast);
 
-      if (response.ok) {
-        // --- SUKSES LOGIN ---
-        if (data.user && data.token) {
-            // 1. Simpan ke Global Store (Zustand & LocalStorage)
-            loginToStore(data.user, data.token); 
-            
-            // 2. Tampilkan Notifikasi Sukses
-            toast.success(`Selamat datang kembali, ${data.user.name}!`, {
-                duration: 2000,
-                style: { background: '#1e293b', color: '#fff', border: '1px solid #5C5CFF' }
-            });
-
-            // 3. Redirect ke Lobby
-            setTimeout(() => {
-                window.location.href = '/lobby';
-            }, 1500);
-        } else {
-            // Fallback
-            toast.success("Login Berhasil!", {
-                style: { background: '#1e293b', color: '#fff' }
-            });
-            setTimeout(() => {
-                window.location.href = '/lobby';
-            }, 1500);
-        }
-      } else {
-        // --- GAGAL LOGIN ---
-        toast.error(data.message || "Email atau Password salah.", {
-            style: { background: '#1e293b', color: '#fff', border: '1px solid #ef4444' }
-        });
+      if (!response.ok) {
+        throw new Error(data?.message || 'Email atau password salah');
       }
 
-    } catch (error) {
-      console.error("Error:", error);
+      // Validasi data user & token
+      if (data.user && data.token) {
+         // Simpan ke Zustand
+         loginToStore(data.user, data.token);
+
+         toast.dismiss(loadingToast);
+         toast.success(`Selamat datang kembali, ${data.user.name}!`, {
+            duration: 2000,
+            style: {
+              background: '#1e293b',
+              color: '#fff',
+              border: '1px solid #5C5CFF',
+            },
+         });
+
+         // Redirect ke Lobby
+         setTimeout(() => {
+            window.location.href = '/lobby';
+         }, 1500);
+      } else {
+         // Fallback jika struktur response berbeda
+         toast.dismiss(loadingToast);
+         toast.success("Login Berhasil!", {
+            style: { background: '#1e293b', color: '#fff' }
+         });
+         setTimeout(() => {
+            window.location.href = '/lobby';
+         }, 1500);
+      }
+
+    } catch (err) {
+      console.error('[LOGIN ERROR]', err);
       toast.dismiss(loadingToast);
-      toast.error("Gagal terhubung ke Server Backend.", {
-        style: { background: '#1e293b', color: '#fff' }
+      toast.error(err.message || 'Gagal login', {
+        style: {
+          background: '#1e293b',
+          color: '#fff',
+          border: '1px solid #ef4444',
+        },
       });
     } finally {
       setIsLoading(false);
@@ -95,7 +104,8 @@ export default function LoginPage() {
       {/* --- BAGIAN KIRI: GAMBAR (55%) --- */}
       <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center bg-[#0B0E14] overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+           {/* Gambar yang sama dengan Register */}
+           <img 
             src="/login-register.jpg" 
             alt="Login Character" 
             className="w-full h-full object-cover opacity-90 hover:scale-105 transition-transform duration-10000 ease-linear"
@@ -103,8 +113,9 @@ export default function LoginPage() {
               e.target.style.display = 'none'; 
               e.target.parentNode.style.backgroundColor = '#1e293b'; 
             }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#020617]/10 to-[#020617] z-10"></div>
+           />
+           {/* Gradient Overlay (PENTING: Ini yang membuat efek menyatu) */}
+           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#020617]/10 to-[#020617] z-10"></div>
         </div>
       </div>
 
@@ -121,23 +132,27 @@ export default function LoginPage() {
                 </div>
                 <span className="font-black text-lg tracking-wider bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mt-2">PUSH ID</span>
             </div>
-            <h2 className="text-2xl md:text-1xl font-bold text-white tracking-wide text-center mt-2 uppercase">Welcome Back Admiral!</h2>
+            <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide text-center mt-2 uppercase">Welcome Back!</h2>
           </div>
 
-          {/* TABS */}
+          {/* TABS (Login | Sign up) */}
           <div className="flex gap-8 mb-6 text-lg font-semibold pl-1">
-            <button className="text-blue-500 transition-colors relative">
+            <button className="text-blue-500 transition-colors relative cursor-default">
               Login
               <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-blue-500 rounded-full"></span>
             </button>
-            <a href="/register" className="text-slate-500 hover:text-slate-300 transition-colors">Sign up</a>
+            
+            {/* Link ke Register */}
+            <a href="/register" className="text-slate-500 hover:text-slate-300 transition-colors cursor-pointer">
+              Sign up
+            </a>
           </div>
 
-          {/* FORM */}
+          {/* FORM AREA */}
           <form className="space-y-4" onSubmit={handleLogin}>
             
             {/* Input Email */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
               <input 
                 name="email"
@@ -150,7 +165,7 @@ export default function LoginPage() {
             </div>
 
             {/* Input Password */}
-            <div className="space-y-2">
+            <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
               <div className="relative">
                 <input 
@@ -171,16 +186,25 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
+            {/* Remember & Forgot */}
             <div className="flex items-center justify-between pt-2">
                <div className="flex items-center gap-2 cursor-pointer group" onClick={() => setRememberMe(!rememberMe)}>
-                  {rememberMe ? <CheckSquare size={16} className="text-blue-600" /> : <Square size={16} className="text-slate-600 group-hover:text-slate-400" />}
-                  <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">Remember Me</span>
+                  {rememberMe ? (
+                     <CheckSquare size={16} className="text-blue-600" />
+                  ) : (
+                     <Square size={16} className="text-slate-600 group-hover:text-slate-400" />
+                  )}
+                  <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">
+                    Remember Me
+                  </span>
                </div>
-               <a href="#" className="text-xs text-blue-500 hover:text-blue-400 font-bold transition-colors">Forgot Password?</a>
+               
+               <a href="#" className="text-xs text-blue-500 hover:text-blue-400 font-bold transition-colors">
+                  Forgot Password?
+               </a>
             </div>
 
-            {/* Tombol Login */}
+            {/* Login Button */}
             <button 
                 type="submit" 
                 disabled={isLoading}
@@ -190,14 +214,24 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* Social Login */}
-          <div className="relative flex py-2 items-center"><div className="flex-grow border-t border-slate-800"></div><span className="flex-shrink mx-4 text-slate-600 text-[10px] font-bold uppercase tracking-widest">OR</span><div className="flex-grow border-t border-slate-800"></div></div>
+          {/* Divider */}
+          <div className="relative flex py-2 items-center">
+            <div className="flex-grow border-t border-slate-800"></div>
+            <span className="flex-shrink mx-4 text-slate-600 text-[10px] font-bold uppercase tracking-widest">OR</span>
+            <div className="flex-grow border-t border-slate-800"></div>
+          </div>
+
+          {/* Social Buttons */}
           <div className="space-y-3">
-             <button className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold py-3 rounded-xl flex items-center justify-center gap-3 transition-all text-sm">
-                <svg className="w-4 h-4" viewBox="0 0 24 24"><path fill="#EA4335" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 .533 5.333.533 12S5.867 24 12.48 24c3.44 0 6.04-1.133 7.973-2.96 1.96-1.933 2.507-4.84 2.507-7.253 0-.72-.053-1.387-.16-2.027H12.48z" /></svg>
+            {/* Tombol Google dengan SVG */}
+            <button className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 text-slate-300 font-semibold py-3 rounded-xl flex items-center justify-center gap-3 transition-all group text-sm">
+                <svg className="w-4 h-4 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
+                    <path fill="#EA4335" d="M12.48 10.92v3.28h7.84c-.24 1.84-.853 3.187-1.787 4.133-1.147 1.147-2.933 2.4-6.053 2.4-4.827 0-8.6-3.893-8.6-8.72s3.773-8.72 8.6-8.72c2.6 0 4.507 1.027 5.907 2.347l2.307-2.307C18.747 1.44 16.133 0 12.48 0 5.867 0 0.507 5.387 0 12s5.36 12 12 12c3.627 0 6.373-1.2 8.587-3.493 2.293-2.347 2.947-5.92 2.947-8.213 0-.8-.08-1.48-.24-2.133H12.48z"/>
+                </svg>
                 Continue With Google
-             </button>
-              <button className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 hover:border-slate-600 text-slate-300 font-semibold py-3 rounded-xl flex items-center justify-center gap-3 transition-all group text-sm">
+            </button>
+
+            <button className="w-full bg-transparent border border-slate-700 hover:bg-slate-800 hover:border-slate-600 text-slate-300 font-semibold py-3 rounded-xl flex items-center justify-center gap-3 transition-all group text-sm">
               <Apple size={18} className="text-white pb-0.5 group-hover:scale-110 transition-transform" />
               Continue With Apple
             </button>

@@ -1,22 +1,24 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
-// Kita pakai 'persist' supaya kalau di-refresh datanya gak hilang
+// Store ini berfungsi menyimpan data user secara global
+// persist akan menyimpannya ke LocalStorage browser agar tidak hilang saat refresh
 export const useAuthStore = create(
   persist(
     (set) => ({
       // State Awal
-      user: null,       // Belum login
-      token: null,      // Belum ada token
-      isLoggedIn: false,
+      user: null,       // Data user (nama, email, dll)
+      token: null,      // Token autentikasi dari backend
+      isLoggedIn: false, // Status login
 
-      // Aksi (Actions)
+      // Aksi Login: Menyimpan data user & token
       login: (userData, token) => set({ 
         user: userData, 
         token: token, 
         isLoggedIn: true 
       }),
 
+      // Aksi Logout: Menghapus data user & token
       logout: () => set({ 
         user: null, 
         token: null, 
@@ -24,7 +26,7 @@ export const useAuthStore = create(
       }),
     }),
     {
-      name: 'squadup-storage', // Nama key di LocalStorage browser
+      name: 'squadup-storage', // Nama key unik di LocalStorage
     }
   )
 );
