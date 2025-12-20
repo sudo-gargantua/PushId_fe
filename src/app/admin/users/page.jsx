@@ -1,325 +1,284 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Search,
-  Filter,
-  MoreVertical,
-  UserCheck,
-  UserX,
-  Shield,
-  ArrowLeft,
-  Mail,
-  Calendar,
-  GamepadIcon
+import { 
+  Users, Trash2, Ban, Search, CheckCircle, MoreVertical, Check, AlertTriangle, X
 } from 'lucide-react';
-import Link from 'next/link';
+import toast, { Toaster } from 'react-hot-toast';
+// Impor Sidebar dari komponen yang sudah pasti dibuat
+import AdminSidebar from '../../../components/admin/AdminSidebar';
 
-// Mock user data
+// Data Mockup Users
 const MOCK_USERS = [
-  {
-    id: 1,
-    name: 'ProGamer123',
-    email: 'progamer@example.com',
-    status: 'active',
-    role: 'user',
-    joinDate: '2024-01-15',
-    lastActive: '2 hours ago',
-    lobbiesCreated: 5,
-    reportsCount: 0
-  },
-  {
-    id: 2,
-    name: 'ToxicPlayer',
-    email: 'toxic@example.com',
-    status: 'banned',
-    role: 'user',
-    joinDate: '2024-02-20',
-    lastActive: '1 week ago',
-    lobbiesCreated: 2,
-    reportsCount: 3
-  },
-  {
-    id: 3,
-    name: 'MLBBMaster',
-    email: 'mlbb@example.com',
-    status: 'active',
-    role: 'user',
-    joinDate: '2024-01-10',
-    lastActive: '30 minutes ago',
-    lobbiesCreated: 8,
-    reportsCount: 1
-  },
-  {
-    id: 4,
-    name: 'AdminUser',
-    email: 'admin@pushid.com',
-    status: 'active',
-    role: 'admin',
-    joinDate: '2023-12-01',
-    lastActive: '5 minutes ago',
-    lobbiesCreated: 0,
-    reportsCount: 0
-  },
-  {
-    id: 5,
-    name: 'NewbieGamer',
-    email: 'newbie@example.com',
-    status: 'active',
-    role: 'user',
-    joinDate: '2024-12-15',
-    lastActive: '1 day ago',
-    lobbiesCreated: 1,
-    reportsCount: 0
-  }
+  { id: 1, username: 'ToxicKing99', email: 'toxic@email.com', status: 'active', reportsCount: 5, joinDate: '2024-01-10' },
+  { id: 2, username: 'GoodPlayer01', email: 'good@email.com', status: 'active', reportsCount: 0, joinDate: '2024-02-15' },
+  { id: 3, username: 'NoobMaster69', email: 'noob@email.com', status: 'banned', banUntil: '2024-04-20', reportsCount: 2, joinDate: '2024-03-01' },
+  { id: 4, username: 'ScammerAlert', email: 'scam@email.com', status: 'active', reportsCount: 10, joinDate: '2023-12-05' },
+  { id: 5, username: 'ProPlayer_X', email: 'pro@email.com', status: 'active', reportsCount: 1, joinDate: '2024-01-20' },
 ];
 
-export default function AdminUsersPage() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [roleFilter, setRoleFilter] = useState('all');
+export default function UserManagementPage() {
+  const [users, setUsers] = useState(MOCK_USERS);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  
+  // Modals State
+  const [showBanModal, setShowBanModal] = useState(false);
+  const [showDeleteUserModal, setShowDeleteUserModal] = useState(false);
+  
+  // Action State
+  const [banDuration, setBanDuration] = useState('3_days');
+  const [customBanReason, setCustomBanReason] = useState('');
+  const [openUserDropdown, setOpenUserDropdown] = useState(null);
 
-  // Filter users based on search and filters
-  const filteredUsers = MOCK_USERS.filter(user => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || user.status === statusFilter;
-    const matchesRole = roleFilter === 'all' || user.role === roleFilter;
+  // --- LOGIC SEARCH / FILTER ---
+  const filteredUsers = users.filter(user => 
+    user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    user.email.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    return matchesSearch && matchesStatus && matchesRole;
-  });
+  // --- ACTIONS ---
 
-  const handleUserAction = (userId, action) => {
-    // Mock actions - in real app, these would call APIs
-    const user = MOCK_USERS.find(u => u.id === userId);
-    if (!user) return;
-
-    switch (action) {
-      case 'ban':
-        alert(`User ${user.name} telah dibanned (Mock)`);
-        break;
-      case 'unban':
-        alert(`User ${user.name} telah diunban (Mock)`);
-        break;
-      case 'demote':
-        alert(`User ${user.name} telah diturunkan ke user biasa (Mock)`);
-        break;
-      default:
-        break;
-    }
-    setSelectedUser(null);
+  const handleBanClick = (user) => {
+    setSelectedUser(user);
+    setOpenUserDropdown(null);
+    setShowBanModal(true);
+    setCustomBanReason(`Akun Anda dinonaktifkan sementara karena pelanggaran komunitas.`);
   };
 
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'active': return 'text-green-400 bg-green-900/20';
-      case 'banned': return 'text-red-400 bg-red-900/20';
-      case 'inactive': return 'text-yellow-400 bg-yellow-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
+  const handleDeleteUserClick = (user) => {
+    setSelectedUser(user);
+    setOpenUserDropdown(null);
+    setShowDeleteUserModal(true);
+  };
+
+  const handleUnbanUser = (userId) => {
+    if(confirm("Apakah Anda yakin ingin membuka blokir (Unban) user ini?")) {
+        setUsers(users.map(u => u.id === userId ? { ...u, status: 'active' } : u));
+        toast.success("User berhasil di-unban.");
+        setOpenUserDropdown(null);
     }
   };
 
-  const getRoleColor = (role) => {
-    switch (role) {
-      case 'admin': return 'text-purple-400 bg-purple-900/20';
-      case 'moderator': return 'text-blue-400 bg-blue-900/20';
-      case 'user': return 'text-gray-400 bg-gray-900/20';
-      default: return 'text-gray-400 bg-gray-900/20';
-    }
+  const confirmBanUser = () => {
+    toast.promise(
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+      {
+        loading: 'Memproses Ban User...',
+        success: () => {
+          setUsers(users.map(u => u.id === selectedUser.id ? { ...u, status: 'banned' } : u));
+          setShowBanModal(false);
+          return `User ${selectedUser.username} berhasil di-banned.`;
+        },
+        error: 'Gagal.',
+      }
+    );
+  };
+
+  const confirmDeleteUser = () => {
+    toast.promise(
+      new Promise((resolve) => setTimeout(resolve, 1500)),
+      {
+        loading: 'Menghapus User Permanen...',
+        success: () => {
+          setUsers(users.filter(u => u.id !== selectedUser.id));
+          setShowDeleteUserModal(false);
+          return `Akun ${selectedUser.username} telah dihapus permanen.`;
+        },
+        error: 'Gagal.',
+      }
+    );
   };
 
   return (
-    <div className="min-h-screen bg-[#020617] text-white font-sans">
-      {/* Header */}
-      <header className="bg-[#0F172A] border-b border-[#1e2230] px-6 py-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
-            <Link href="/admin" className="text-gray-400 hover:text-white transition-colors">
-              <ArrowLeft size={24} />
-            </Link>
-            <Shield size={32} className="text-[#5C5CFF]" />
-            <div>
-              <h1 className="text-xl font-bold text-white">User Management</h1>
-              <p className="text-sm text-gray-400">Manage user accounts and permissions</p>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#020617] text-white font-sans flex">
+      <Toaster position="top-right" />
+      
+      {/* Sidebar Component */}
+      <AdminSidebar activePage="users" />
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {/* Filters and Search */}
-        <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 mb-8">
-          <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Cari user berdasarkan nama atau email..."
+      <main className="flex-1 md:ml-64 p-8">
+        
+        {/* Header */}
+        <div className="flex justify-between items-center mb-8">
+          <div>
+            <h1 className="text-3xl font-bold text-white mb-2">Manajemen User</h1>
+            <p className="text-slate-400">Kelola status dan akses pengguna platform.</p>
+          </div>
+          <div className="relative">
+            {/* Input Pencarian */}
+            <input 
+                type="text" 
+                placeholder="Cari username atau email..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all"
-              />
-            </div>
-
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all"
-            >
-              <option value="all">Semua Status</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="banned">Banned</option>
-            </select>
-
-            {/* Role Filter */}
-            <select
-              value={roleFilter}
-              onChange={(e) => setRoleFilter(e.target.value)}
-              className="px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all"
-            >
-              <option value="all">Semua Role</option>
-              <option value="user">User</option>
-              <option value="moderator">Moderator</option>
-              <option value="admin">Admin</option>
-            </select>
+                className="bg-[#0F172A] border border-[#1e2230] rounded-xl pl-10 pr-4 py-2 text-sm text-white focus:outline-none focus:border-blue-500 w-64 focus:w-80 transition-all" 
+            />
+            <Search className="absolute left-3 top-2.5 text-slate-500" size={16} />
           </div>
         </div>
 
-        {/* Users Table */}
-        <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#1e2230]">
-                <tr>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">User</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Status</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Role</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Join Date</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Last Active</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Lobbies</th>
-                  <th className="px-6 py-4 text-left text-sm font-semibold text-gray-300">Reports</th>
-                  <th className="px-6 py-4 text-center text-sm font-semibold text-gray-300">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#1e2230]">
-                {filteredUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-[#1e2230]/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-[#5C5CFF] flex items-center justify-center">
-                          <span className="text-white font-bold text-sm">
-                            {user.name.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <div className="font-semibold text-white">{user.name}</div>
-                          <div className="text-sm text-gray-400">{user.email}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(user.status)}`}>
-                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getRoleColor(user.role)}`}>
-                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">
-                      {new Date(user.joinDate).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{user.lastActive}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{user.lobbiesCreated}</td>
-                    <td className="px-6 py-4 text-sm text-gray-300">{user.reportsCount}</td>
-                    <td className="px-6 py-4 text-center">
-                      <div className="relative">
-                        <button
-                          onClick={() => setSelectedUser(selectedUser === user.id ? null : user.id)}
-                          className="p-2 rounded-lg hover:bg-[#2a2f42] transition-colors"
-                        >
-                          <MoreVertical size={16} className="text-gray-400" />
-                        </button>
+        {/* User Table */}
+        <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl overflow-hidden shadow-xl">
+            <table className="w-full text-left">
+                <thead className="bg-[#1e2230] text-slate-400 text-xs uppercase font-bold">
+                    <tr>
+                        <th className="px-6 py-4">Username</th>
+                        <th className="px-6 py-4">Email</th>
+                        <th className="px-6 py-4">Bergabung</th>
+                        <th className="px-6 py-4 text-center">Pelanggaran</th>
+                        <th className="px-6 py-4 text-center">Status</th>
+                        <th className="px-6 py-4 text-center">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody className="divide-y divide-[#1e2230]">
+                    {filteredUsers.length > 0 ? (
+                        filteredUsers.map((user) => (
+                            <tr key={user.id} className="hover:bg-[#1e2230]/50 transition-colors">
+                                <td className="px-6 py-4 font-bold text-white">{user.username}</td>
+                                <td className="px-6 py-4 text-slate-400 text-sm">{user.email}</td>
+                                <td className="px-6 py-4 text-slate-500 text-sm">{user.joinDate}</td>
+                                <td className="px-6 py-4 text-center">
+                                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${user.reportsCount > 3 ? 'bg-red-900/50 text-red-400' : 'bg-slate-800 text-slate-300'}`}>
+                                        {user.reportsCount}x
+                                    </span>
+                                </td>
+                                <td className="px-6 py-4 text-center">
+                                    {user.status === 'active' ? (
+                                        <span className="text-green-500 font-bold text-xs flex items-center justify-center gap-1 bg-green-900/20 px-2 py-1 rounded border border-green-900/50">
+                                            <CheckCircle size={14}/> Aktif
+                                        </span>
+                                    ) : (
+                                        <span className="text-red-500 font-bold text-xs flex items-center justify-center gap-1 bg-red-900/20 px-2 py-1 rounded border border-red-900/50">
+                                            <Ban size={14}/> Banned
+                                        </span>
+                                    )}
+                                </td>
+                                <td className="px-6 py-4 text-center relative">
+                                    <button 
+                                        onClick={() => setOpenUserDropdown(openUserDropdown === user.id ? null : user.id)}
+                                        className="p-2 rounded-lg hover:bg-slate-700 text-slate-400 hover:text-white transition-colors"
+                                    >
+                                        <MoreVertical size={18} />
+                                    </button>
 
-                        {selectedUser === user.id && (
-                          <div className="absolute right-0 top-8 w-48 bg-[#0F172A] border border-[#1e2230] rounded-xl shadow-2xl z-50">
-                            <div className="py-2">
-                              {user.status === 'banned' ? (
-                                <button
-                                  onClick={() => handleUserAction(user.id, 'unban')}
-                                  className="w-full px-4 py-2 text-left text-sm text-green-400 hover:bg-[#1e2230] flex items-center gap-2 transition-colors"
-                                >
-                                  <UserCheck size={14} />
-                                  Unban User
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => handleUserAction(user.id, 'ban')}
-                                  className="w-full px-4 py-2 text-left text-sm text-red-400 hover:bg-[#1e2230] flex items-center gap-2 transition-colors"
-                                >
-                                  <UserX size={14} />
-                                  Ban User
-                                </button>
-                              )}
-
-                              {user.role === 'admin' && user.id !== 4 && ( // Don't allow demoting the main admin
-                                <button
-                                  onClick={() => handleUserAction(user.id, 'demote')}
-                                  className="w-full px-4 py-2 text-left text-sm text-yellow-400 hover:bg-[#1e2230] flex items-center gap-2 transition-colors"
-                                >
-                                  <UserCheck size={14} />
-                                  Demote to User
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                                    {/* Dropdown Menu */}
+                                    {openUserDropdown === user.id && (
+                                        <div className="absolute right-8 top-10 w-48 bg-[#1e2230] border border-slate-700 rounded-xl shadow-xl z-50 overflow-hidden">
+                                            {user.status === 'active' ? (
+                                                <button 
+                                                    onClick={() => handleBanClick(user)}
+                                                    className="w-full text-left px-4 py-3 text-sm font-bold text-yellow-500 hover:bg-slate-700 flex items-center gap-2"
+                                                >
+                                                    <Ban size={16} /> Ban Akun
+                                                </button>
+                                            ) : (
+                                                <button 
+                                                    onClick={() => handleUnbanUser(user.id)}
+                                                    className="w-full text-left px-4 py-3 text-sm font-bold text-green-500 hover:bg-slate-700 flex items-center gap-2"
+                                                >
+                                                    <Check size={16} /> Unban Akun
+                                                </button>
+                                            )}
+                                            
+                                            <div className="border-t border-slate-700 my-1"></div>
+                                            
+                                            <button 
+                                                onClick={() => handleDeleteUserClick(user)}
+                                                className="w-full text-left px-4 py-3 text-sm font-bold text-red-500 hover:bg-red-900/20 flex items-center gap-2"
+                                            >
+                                                <Trash2 size={16} /> Hapus Permanen
+                                            </button>
+                                        </div>
+                                    )}
+                                </td>
+                            </tr>
+                        ))
+                    ) : (
+                        <tr>
+                            <td colSpan="6" className="px-6 py-8 text-center text-slate-500">
+                                Tidak ada user ditemukan dengan nama "{searchTerm}"
+                            </td>
+                        </tr>
+                    )}
+                </tbody>
             </table>
-          </div>
-
-          {filteredUsers.length === 0 && (
-            <div className="text-center py-12">
-              <p className="text-gray-400">Tidak ada user ditemukan dengan filter yang dipilih.</p>
-            </div>
-          )}
         </div>
+      </main>
 
-        {/* Stats Footer */}
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 text-center">
-            <div className="text-2xl font-bold text-[#5C5CFF] mb-2">{MOCK_USERS.length}</div>
-            <div className="text-sm text-gray-400">Total Users</div>
-          </div>
-          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 text-center">
-            <div className="text-2xl font-bold text-green-400 mb-2">
-              {MOCK_USERS.filter(u => u.status === 'active').length}
+      {/* --- MODAL BAN USER --- */}
+      {showBanModal && selectedUser && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl w-full max-w-lg shadow-2xl p-6">
+            <div className="flex justify-between items-start mb-4">
+                <h3 className="text-xl font-bold text-white">Ban User: <span className="text-yellow-500">{selectedUser.username}</span></h3>
+                <button onClick={() => setShowBanModal(false)}><X size={20} className="text-slate-500 hover:text-white"/></button>
             </div>
-            <div className="text-sm text-gray-400">Active Users</div>
-          </div>
-          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 text-center">
-            <div className="text-2xl font-bold text-red-400 mb-2">
-              {MOCK_USERS.filter(u => u.status === 'banned').length}
+            
+            <p className="text-slate-400 text-sm mb-6">User ini tidak akan bisa login selama periode ban.</p>
+
+            <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Durasi Ban</label>
+                <select 
+                    value={banDuration} 
+                    onChange={(e) => setBanDuration(e.target.value)}
+                    className="w-full bg-[#020617] border border-[#1e2230] rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 cursor-pointer"
+                >
+                    <option value="1_day">1 Hari</option>
+                    <option value="3_days">3 Hari</option>
+                    <option value="1_week">1 Minggu</option>
+                    <option value="1_month">1 Bulan</option>
+                    <option value="permanent">Permanen</option>
+                </select>
             </div>
-            <div className="text-sm text-gray-400">Banned Users</div>
-          </div>
-          <div className="bg-[#0F172A] border border-[#1e2230] rounded-2xl p-6 text-center">
-            <div className="text-2xl font-bold text-purple-400 mb-2">
-              {MOCK_USERS.filter(u => u.role === 'admin').length}
+
+            <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Alasan / Pesan ke User</label>
+                <textarea 
+                    value={customBanReason}
+                    onChange={(e) => setCustomBanReason(e.target.value)}
+                    className="w-full bg-[#020617] border border-[#1e2230] rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 h-24 resize-none"
+                />
             </div>
-            <div className="text-sm text-gray-400">Admin Users</div>
+
+            <div className="flex gap-4">
+                <button onClick={() => setShowBanModal(false)} className="flex-1 py-3 bg-transparent border border-[#1e2230] text-slate-400 font-bold rounded-xl hover:text-white">Batal</button>
+                <button onClick={confirmBanUser} className="flex-1 py-3 bg-yellow-600 hover:bg-yellow-700 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2">
+                    <Ban size={18} /> Eksekusi Ban
+                </button>
+            </div>
           </div>
         </div>
-      </div>
+      )}
+
+      {/* --- MODAL HAPUS USER (PERMANEN) --- */}
+      {showDeleteUserModal && selectedUser && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-[#0F172A] border border-red-900/50 rounded-2xl w-full max-w-md shadow-2xl p-6 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10">
+                <AlertTriangle size={120} className="text-red-500" />
+            </div>
+
+            <h3 className="text-2xl font-bold text-red-500 mb-4 flex items-center gap-2">
+                <AlertTriangle size={24} /> HAPUS AKUN?
+            </h3>
+            <p className="text-slate-300 mb-2">
+                Anda akan menghapus akun <span className="font-bold text-white">{selectedUser.username}</span> secara permanen.
+            </p>
+            <p className="text-slate-400 text-sm mb-6 bg-red-900/20 p-3 rounded-lg border border-red-900/30">
+                Tindakan ini tidak dapat dibatalkan. Semua data user termasuk lobby dan riwayat akan hilang.
+            </p>
+
+            <div className="flex gap-4">
+                <button onClick={() => setShowDeleteUserModal(false)} className="flex-1 py-3 bg-transparent border border-[#1e2230] text-slate-400 font-bold rounded-xl hover:text-white">Batal</button>
+                <button onClick={confirmDeleteUser} className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg flex items-center justify-center gap-2">
+                    <Trash2 size={18} /> Ya, Hapus!
+                </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
