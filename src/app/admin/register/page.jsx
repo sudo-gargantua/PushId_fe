@@ -1,12 +1,23 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Eye, EyeOff, Shield, ArrowLeft, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, UserPlus, Mail, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useToast } from '@/components/Toast';
+import { useAdminAuthStore } from '@/store/useAdminAuthStore';
+
+// Kode admin rahasia (6 digit)
+const VALID_ADMIN_CODE = '177013';
 
 export default function AdminRegisterPage() {
+  const router = useRouter();
+  const toast = useToast();
+  const { loginAdmin } = useAdminAuthStore();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,30 +28,82 @@ export default function AdminRegisterPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
+
+    // Untuk adminCode, hanya izinkan angka dan maksimal 6 digit
+    if (name === 'adminCode') {
+      const numericValue = value.replace(/\D/g, '').slice(0, 6);
+      setFormData(prev => ({
+        ...prev,
+        [name]: numericValue
+      }));
+      return;
+    }
+
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
-    // Basic validation
+    // Validasi password match
     if (formData.password !== formData.confirmPassword) {
-      alert('Password dan konfirmasi password tidak cocok');
+      toast.error('Password dan konfirmasi password tidak cocok');
+      setLoading(false);
       return;
     }
 
-    if (formData.adminCode !== 'ADMIN2024') {
-      alert('Kode admin tidak valid');
+    // Validasi password length
+    if (formData.password.length < 8) {
+      toast.error('Password minimal 8 karakter');
+      setLoading(false);
       return;
     }
 
-    // Mock registration - in real app, this would call an API
-    console.log('Admin registration attempt:', formData);
-    alert('Registrasi berhasil! (Mock)');
-    // Redirect to login would happen here
+    // Validasi kode admin: harus 6 digit angka
+    const adminCodeRegex = /^\d{6}$/;
+    if (!adminCodeRegex.test(formData.adminCode)) {
+      toast.error('Kode admin harus berupa 6 digit angka');
+      setLoading(false);
+      return;
+    }
+
+    // Validasi kode admin dengan kode yang valid
+    if (formData.adminCode !== VALID_ADMIN_CODE) {
+      toast.error('Kode admin tidak valid. Hubungi admin untuk mendapatkan kode yang benar.');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Untuk sementara, simpan data admin ke localStorage (tanpa backend)
+      // Nanti bisa diganti dengan API call ke backend
+      const adminData = {
+        id: Date.now(),
+        name: formData.name,
+        email: formData.email,
+        role: 'admin',
+        createdAt: new Date().toISOString()
+      };
+
+      // Simpan ke store
+      loginAdmin(adminData, 'mock-admin-token-' + Date.now());
+
+      toast.success('Registrasi berhasil! Mengalihkan ke dashboard...');
+
+      // Redirect ke dashboard admin setelah delay
+      setTimeout(() => {
+        router.push('/admin');
+      }, 1500);
+
+    } catch (err) {
+      toast.error('Terjadi kesalahan saat registrasi');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -157,24 +220,30 @@ export default function AdminRegisterPage() {
                 Kode Admin
               </label>
               <input
-                type="password"
+                type="text"
+                inputMode="numeric"
                 id="adminCode"
                 name="adminCode"
                 value={formData.adminCode}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all"
-                placeholder="Masukkan kode admin"
+                maxLength={6}
+                className="w-full px-4 py-3 rounded-xl border border-[#1e2230] bg-[#0F172A] text-white placeholder-gray-400 focus:outline-none focus:border-[#5C5CFF] focus:ring-2 focus:ring-[#5C5CFF]/20 transition-all text-center text-2xl tracking-[0.5em] font-mono"
+                placeholder="••••••"
               />
-              <p className="text-xs text-gray-500 mt-1">Kode admin diperlukan untuk verifikasi</p>
+              <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                <Mail size={12} />
+                Hubungi admin di <a href="mailto:greenwhite853@gmail.com" className="text-[#5C5CFF] hover:underline">greenwhite853@gmail.com</a> untuk mendapatkan kode
+              </p>
             </div>
 
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-xl bg-[#5C5CFF] text-white font-bold hover:bg-[#4a4ae0] transition-colors shadow-lg"
+              disabled={loading}
+              className="w-full py-3 px-4 rounded-xl bg-[#5C5CFF] text-white font-bold hover:bg-[#4a4ae0] transition-colors shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Daftar sebagai Admin
+              {loading ? 'Mendaftar...' : 'Daftar sebagai Admin'}
             </button>
           </form>
 

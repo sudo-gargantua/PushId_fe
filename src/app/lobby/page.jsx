@@ -118,7 +118,7 @@ export default function LobbyPage() {
     if (!confirm("Apakah Anda yakin ingin menghapus lobi Anda?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/api/lobbies/${item.id}`, {
+      const res = await fetch(`http://localhost:8000/api/lobbies/${item.slug}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

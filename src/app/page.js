@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { User, Gamepad2, Menu, X, LogOut } from 'lucide-react';
+import { User, Gamepad2, Menu, X, LogOut, Mail, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store/useAuthStore';
@@ -14,13 +14,13 @@ const App = () => {
   const handleLogout = (e) => {
     e.preventDefault(); // Mencegah navigasi Link
     if (confirm("Apakah Anda yakin ingin keluar?")) {
-      logout(); 
+      logout();
       router.push('/login');
     }
   };
 
   // --- DATA ---
-  
+
   // Data untuk Landing Page (Home)
   const homeCharacters = [
     { id: 1, src: "/ahri-artwork.jpg", alt: "League Of Legends" },
@@ -31,27 +31,27 @@ const App = () => {
 
   // Data untuk About Page (Game Cards)
   const games = [
-    { 
-      id: 1, 
-      name: "LEAGUE OF LEGENDS: WILD RIFT", 
+    {
+      id: 1,
+      name: "LEAGUE OF LEGENDS: WILD RIFT",
       src: "/Ahri-img.jpg",
       logoColor: "text-blue-400"
     },
-    { 
-      id: 2, 
-      name: "PLAYER UNKNOWN BATTLEGROUNDS", 
+    {
+      id: 2,
+      name: "PLAYER UNKNOWN BATTLEGROUNDS",
       src: "pubg-img.jpg",
       logoColor: "text-orange-200"
     },
-    { 
-      id: 3, 
-      name: "VALORANT", 
+    {
+      id: 3,
+      name: "VALORANT",
       src: "valorant.png",
       logoColor: "text-red-500"
     },
-    { 
-      id: 4, 
-      name: "HONOR OF KINGS", 
+    {
+      id: 4,
+      name: "HONOR OF KINGS",
       src: "honor-of-kings.png",
       logoColor: "text-yellow-500"
     }
@@ -71,7 +71,7 @@ const App = () => {
   const Navbar = () => (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full max-w-[1400px] mx-auto px-6 md:px-12 py-6 flex justify-between items-center transition-all duration-300 backdrop-blur-sm bg-[#020410]/50">
       {/* Logo */}
-      <div 
+      <div
         className="flex items-center gap-2 cursor-pointer w-[200px]"
         onClick={() => scrollToSection('home')}
       >
@@ -87,17 +87,23 @@ const App = () => {
 
       {/* Desktop Menu */}
       <div className="hidden md:flex items-center justify-center gap-12 font-bold text-base tracking-wide flex-1">
-        <button 
+        <button
           onClick={() => scrollToSection('home')}
           className="text-gray-300 hover:text-[#6366f1] transition-all hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]"
         >
           Home
         </button>
-        <button 
+        <button
           onClick={() => scrollToSection('about')}
           className="text-gray-300 hover:text-[#6366f1] transition-all hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]"
         >
           About
+        </button>
+        <button
+          onClick={() => scrollToSection('contact')}
+          className="text-gray-300 hover:text-[#6366f1] transition-all hover:scale-105 hover:drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]"
+        >
+          Contact
         </button>
       </div>
 
@@ -116,7 +122,7 @@ const App = () => {
 
         {/* Menambahkan Tombol Logout jika User sudah login */}
         {isLoggedIn && (
-          <button 
+          <button
             onClick={handleLogout}
             className="ml-2 p-2 rounded-lg bg-red-500/10 border border-red-500/50 text-red-500 hover:bg-red-500 hover:text-white transition-all"
             title="Logout"
@@ -124,7 +130,7 @@ const App = () => {
             <LogOut size={18} />
           </button>
         )}
-      </div>      
+      </div>
 
       {/* Mobile Toggle */}
       <button className="md:hidden text-white ml-auto" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -139,6 +145,7 @@ const App = () => {
           </button>
           <button onClick={() => scrollToSection('home')} className="text-3xl font-bold text-white hover:text-[#6366f1]">Home</button>
           <button onClick={() => scrollToSection('about')} className="text-3xl font-bold text-white hover:text-[#6366f1]">About</button>
+          <button onClick={() => scrollToSection('contact')} className="text-3xl font-bold text-white hover:text-[#6366f1]">Contact</button>
         </div>
       )}
     </nav>
@@ -146,7 +153,7 @@ const App = () => {
 
   return (
     <div className="min-h-screen bg-[#020410] text-white font-sans overflow-x-hidden relative">
-      
+
       {/* Background Ambient Glows (Fixed for entire page) */}
       <div className="fixed inset-0 pointer-events-none z-0">
         <div className="absolute top-[-20%] left-[20%] w-[60%] h-[60%] bg-blue-900/10 rounded-full blur-[150px]" />
@@ -166,7 +173,7 @@ const App = () => {
                 <div className="absolute inset-0 bg-[#020410]/40" />
               </div>
             ))}
-            
+
             {/* Home Overlay Text */}
             <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center pointer-events-none">
               <h1 className="text-5xl md:text-7xl lg:text-[5.5rem] font-black tracking-tight leading-[1.1] md:leading-[1.1] drop-shadow-2xl text-white mx-auto pointer-events-auto select-none">
@@ -174,7 +181,7 @@ const App = () => {
                 <span className="text-[#6366f1] drop-shadow-[0_0_30px_rgba(99,102,241,0.5)]">the Winner!</span>
               </h1>
               <div className="mt-12 pointer-events-auto">
-                <button 
+                <button
                   onClick={() => router.push('/lobby')}
                   className="group relative px-10 py-4 bg-[#5865F2] hover:bg-[#4d5bf0] text-white text-lg font-bold rounded-full transition-all duration-300 shadow-[0_0_20px_rgba(88,101,242,0.6)] hover:shadow-[0_0_40px_rgba(88,101,242,0.8)] active:scale-95"
                 >
@@ -189,7 +196,7 @@ const App = () => {
       {/* === SECTION 2: ABOUT === */}
       <section id="about" className="relative min-h-screen flex flex-col items-center justify-center py-20 px-4 md:px-12 scroll-mt-20">
         <div className="w-full max-w-[1400px] mx-auto flex flex-col items-center">
-          
+
           {/* Title Section */}
           <div className="text-center mb-16 relative z-10">
             <h2 className="text-3xl md:text-5xl font-bold text-white drop-shadow-lg tracking-wide">
@@ -206,12 +213,12 @@ const App = () => {
             {games.map((game) => (
               <div key={game.id} className="group relative aspect-[3/5] rounded-xl overflow-hidden border border-white/5 hover:border-[#6366f1]/50 transition-all duration-300 shadow-2xl hover:shadow-[0_0_30px_rgba(99,102,241,0.2)]">
                 {/* Image */}
-                <img 
-                  src={game.src} 
-                  alt={game.name} 
+                <img
+                  src={game.src}
+                  alt={game.name}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                 />
-                
+
                 {/* Overlays */}
                 <div className="absolute inset-0 bg-gradient-to-t from-[#020410] via-transparent to-transparent opacity-90" />
                 <div className="absolute inset-0 bg-gradient-to-b from-[#020410]/50 via-transparent to-transparent opacity-60" />
@@ -234,6 +241,61 @@ const App = () => {
               <br />
               <span className="text-white font-bold drop-shadow-md">Pertandingan!</span>
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* === SECTION 3: CONTACT ADMIN === */}
+      <section id="contact" className="relative min-h-[60vh] flex flex-col items-center justify-center py-20 px-4 md:px-12 scroll-mt-20">
+        <div className="w-full max-w-[800px] mx-auto">
+          {/* Card */}
+          <div className="bg-gradient-to-br from-[#0F172A] to-[#1E293B] border border-[#334155] rounded-3xl p-8 md:p-12 shadow-2xl relative overflow-hidden">
+            {/* Decorative glow */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-[#6366f1]/20 rounded-full blur-[100px] -z-0" />
+            <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-600/20 rounded-full blur-[80px] -z-0" />
+
+            <div className="relative z-10 text-center">
+              {/* Icon */}
+              <div className="w-20 h-20 bg-gradient-to-br from-[#6366f1] to-[#8B5CF6] rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#6366f1]/30">
+                <Shield size={40} className="text-white" />
+              </div>
+
+              {/* Title */}
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+                Ingin Menjadi <span className="text-[#6366f1]">Admin?</span>
+              </h2>
+
+              {/* Description */}
+              <p className="text-gray-400 text-lg mb-8 max-w-lg mx-auto leading-relaxed">
+                Untuk menjadi admin PushID, Anda memerlukan kode rahasia 6 digit.
+                Hubungi kami melalui email untuk mendapatkan kode tersebut.
+              </p>
+
+              {/* Contact Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <a
+                  href="mailto:greenwhite853@gmail.com?subject=Request%20Kode%20Admin%20PushID&body=Halo,%20saya%20ingin%20mendaftar%20sebagai%20admin%20PushID.%0A%0ANama:%20%0AAlasan:%20"
+                  className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-[#6366f1] to-[#8B5CF6] hover:from-[#5558E3] hover:to-[#7C4FE0] text-white font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-[#6366f1]/40 hover:scale-105"
+                >
+                  <Mail size={20} className="group-hover:rotate-12 transition-transform" />
+                  <span>Hubungi via Email</span>
+                </a>
+
+                <Link
+                  href="/admin/register"
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-[#1E293B] hover:bg-[#334155] border border-[#475569] text-white font-bold rounded-xl transition-all duration-300 hover:scale-105"
+                >
+                  <span>Sudah Punya Kode?</span>
+                  <span className="text-[#6366f1]">→</span>
+                </Link>
+              </div>
+
+              {/* Email display */}
+              <div className="mt-8 flex items-center justify-center gap-2 text-gray-500">
+                <Mail size={16} />
+                <span className="text-sm">greenwhite853@gmail.com</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
