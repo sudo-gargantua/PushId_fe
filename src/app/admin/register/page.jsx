@@ -71,36 +71,58 @@ export default function AdminRegisterPage() {
       return;
     }
 
-    // Validasi kode admin dengan kode yang valid
-    if (formData.adminCode !== VALID_ADMIN_CODE) {
-      toast.error('Kode admin tidak valid. Hubungi admin untuk mendapatkan kode yang benar.');
-      setLoading(false);
-      return;
-    }
+    // Kode admin akan divalidasi oleh backend
 
     try {
-      // Untuk sementara, simpan data admin ke localStorage (tanpa backend)
-      // Nanti bisa diganti dengan API call ke backend
-      const adminData = {
-        id: Date.now(),
-        name: formData.name,
-        email: formData.email,
-        role: 'admin',
-        createdAt: new Date().toISOString()
-      };
+      // Call backend API untuk registrasi admin
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
 
-      // Simpan ke store
-      loginAdmin(adminData, 'mock-admin-token-' + Date.now());
+      const response = await fetch(`${API_URL}/api/admin/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+          admin_code: formData.adminCode,
+        }),
+      });
 
-      toast.success('Registrasi berhasil! Mengalihkan ke dashboard...');
+      const data = await response.json();
 
-      // Redirect ke dashboard admin setelah delay
-      setTimeout(() => {
-        router.push('/admin');
-      }, 1500);
+      if (response.ok) {
+        // Registrasi berhasil
+        const adminData = {
+          id: data.user.id,
+          name: data.user.name,
+          email: data.user.email,
+          role: data.user.role,
+          createdAt: data.user.created_at || new Date().toISOString()
+        };
+
+        // Simpan token ke localStorage
+        localStorage.setItem('admin_token', data.token);
+
+        // Update zustand store
+        loginAdmin(adminData, data.token);
+
+        toast.success('Registrasi berhasil! Mengalihkan ke dashboard...');
+
+        // Redirect ke dashboard admin setelah delay
+        setTimeout(() => {
+          router.push('/admin');
+        }, 1500);
+      } else {
+        // Registrasi gagal
+        toast.error(data.message || 'Registrasi gagal');
+      }
 
     } catch (err) {
-      toast.error('Terjadi kesalahan saat registrasi');
+      console.error('Register error:', err);
+      toast.error('Terjadi kesalahan saat registrasi. Pastikan server berjalan.');
     } finally {
       setLoading(false);
     }
