@@ -20,12 +20,23 @@ export default function ManageLobbiesPage() {
     const fetchLobbies = async () => {
       try {
         const token = localStorage.getItem('admin_token');
+
+        // Debug: Cek token dan API URL
+        console.log('[ADMIN LOBBIES] Token exists:', !!token);
+        console.log('[ADMIN LOBBIES] Token value:', token?.substring(0, 20) + '...');
+        console.log('[ADMIN LOBBIES] API_URL:', API_URL);
+        console.log('[ADMIN LOBBIES] Calling:', `${API_URL}/api/admin/lobbies`);
+
         const res = await fetch(`${API_URL}/api/admin/lobbies`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
           }
         });
+
+        // Debug: Cek response status
+        console.log('[ADMIN LOBBIES] Response status:', res.status);
+
         if (res.ok) {
           const data = await res.json();
           setLobbies(data || []);

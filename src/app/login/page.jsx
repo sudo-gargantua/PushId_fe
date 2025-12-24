@@ -40,6 +40,10 @@ export default function LoginPage() {
     });
 
     try {
+      // Debug: Log API URL untuk melihat nilai di production
+      console.log('[LOGIN] API_URL:', API_URL);
+      console.log('[LOGIN] Calling:', `${API_URL}/api/login`);
+
       // API Login Laravel
       const response = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
