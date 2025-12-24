@@ -6,6 +6,8 @@ import { Eye, EyeOff, CheckSquare, Square, Apple, Loader2 } from 'lucide-react';
 import axios from 'axios';
 import toast, { Toaster } from 'react-hot-toast';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
@@ -36,7 +38,7 @@ export default function RegisterPage() {
 
     try {
       const res = await axios.post(
-        'http://localhost:8000/api/register',
+        `${API_URL}/api/register`,
         { name, email, password, password_confirmation: password },
         {
           headers: {
@@ -56,7 +58,7 @@ export default function RegisterPage() {
         });
         // Menggunakan window.location untuk preview
         setTimeout(() => {
-            window.location.href = '/login';
+          window.location.href = '/login';
         }, 1200);
       } else {
         const errorMsg = res.data?.errors
@@ -84,18 +86,18 @@ export default function RegisterPage() {
       {/* UPDATE: Mengubah lebar dari w-[50%] menjadi w-[55%] agar SAMA dengan Login Page */}
       <div className="hidden lg:flex lg:w-[55%] relative items-center justify-center bg-[#0B0E14] overflow-hidden">
         <div className="absolute inset-0 z-0">
-            {/* Gambar Register */}
-            <img 
-              src="/login-register.jpg" 
-              alt="Register Character" 
-              className="w-full h-full object-cover object-top opacity-90 hover:scale-105 transition-transform duration-10000 ease-linear"
-              onError={(e) => {
-                e.target.style.display = 'none'; 
-                e.target.parentNode.style.backgroundColor = '#1e293b'; 
-              }}
-            />
-            {/* FIX: Gradient diperbaiki menggunakan 'via-' agar transisi lebih halus ke background #020617 */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#020617]/10 to-[#020617] z-10"></div>
+          {/* Gambar Register */}
+          <img
+            src="/login-register.jpg"
+            alt="Register Character"
+            className="w-full h-full object-cover object-top opacity-90 hover:scale-105 transition-transform duration-10000 ease-linear"
+            onError={(e) => {
+              e.target.style.display = 'none';
+              e.target.parentNode.style.backgroundColor = '#1e293b';
+            }}
+          />
+          {/* FIX: Gradient diperbaiki menggunakan 'via-' agar transisi lebih halus ke background #020617 */}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-[#020617]/10 to-[#020617] z-10"></div>
         </div>
       </div>
 
@@ -107,11 +109,11 @@ export default function RegisterPage() {
           {/* HEADER */}
           <div className="flex flex-col items-center mb-8">
             <div className="flex flex-col items-center gap-2 mb-2">
-                <div className="relative">
-                    <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-lg flex items-center justify-center font-black text-xl italic shadow-[0_0_15px_rgba(37,99,235,0.5)] z-10 relative">P</div>
-                    <div className="absolute -inset-1 bg-blue-500/20 blur-lg rounded-full"></div>
-                </div>
-                <span className="font-black text-lg tracking-wider bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mt-2">PUSH ID</span>
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-lg flex items-center justify-center font-black text-xl italic shadow-[0_0_15px_rgba(37,99,235,0.5)] z-10 relative">P</div>
+                <div className="absolute -inset-1 bg-blue-500/20 blur-lg rounded-full"></div>
+              </div>
+              <span className="font-black text-lg tracking-wider bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent mt-2">PUSH ID</span>
             </div>
             <h2 className="text-2xl md:text-3xl font-bold text-white tracking-wide text-center mt-2">Create your Account</h2>
           </div>
@@ -129,16 +131,16 @@ export default function RegisterPage() {
 
           {/* FORM */}
           <form className="space-y-4" onSubmit={handleRegister}>
-            
+
             {/* Input Name */}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Your name</label>
-              <input 
+              <input
                 required
-                type="text" 
+                type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Enter your name..." 
+                placeholder="Enter your name..."
                 className="w-full bg-[#0F1218] border border-[#1F2937] rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-inner"
               />
             </div>
@@ -146,12 +148,12 @@ export default function RegisterPage() {
             {/* Input Email */}
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Email Address</label>
-              <input 
+              <input
                 required
-                type="email" 
+                type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your Email Address..." 
+                placeholder="Enter your Email Address..."
                 className="w-full bg-[#0F1218] border border-[#1F2937] rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-inner"
               />
             </div>
@@ -160,15 +162,15 @@ export default function RegisterPage() {
             <div className="space-y-1">
               <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wider ml-1">Password</label>
               <div className="relative">
-                <input 
+                <input
                   required
-                  type={showPassword ? "text" : "password"} 
+                  type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter Your Password..." 
+                  placeholder="Enter Your Password..."
                   className="w-full bg-[#0F1218] border border-[#1F2937] rounded-xl px-4 py-3.5 text-sm text-white placeholder-slate-600 focus:outline-none focus:border-blue-600 focus:ring-1 focus:ring-blue-600 transition-all shadow-inner"
                 />
-                <button 
+                <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors focus:outline-none"
@@ -180,21 +182,21 @@ export default function RegisterPage() {
 
             {/* Terms Checkbox */}
             <div className="flex items-center gap-2 pt-2 cursor-pointer group" onClick={() => setAgreeTerms(!agreeTerms)}>
-               {agreeTerms ? (
-                  <CheckSquare size={16} className="text-blue-600" />
-               ) : (
-                  <Square size={16} className="text-slate-600 group-hover:text-slate-400" />
-               )}
-               <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">
-                 I agree to terms & conditions
-               </span>
+              {agreeTerms ? (
+                <CheckSquare size={16} className="text-blue-600" />
+              ) : (
+                <Square size={16} className="text-slate-600 group-hover:text-slate-400" />
+              )}
+              <span className="text-xs text-slate-400 group-hover:text-slate-300 transition-colors">
+                I agree to terms & conditions
+              </span>
             </div>
 
             {/* Submit Button */}
-            <button 
-                type="submit" 
-                disabled={isLoading}
-                className="w-full bg-[#5C5CFF] hover:bg-[#4848d1] disabled:bg-slate-700 text-white font-bold py-3.5 rounded-xl shadow-[0_0_20px_rgba(92,92,255,0.4)] hover:shadow-[0_0_25px_rgba(92,92,255,0.6)] transition-all duration-300 transform active:scale-[0.98] mt-4 flex items-center justify-center gap-2"
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full bg-[#5C5CFF] hover:bg-[#4848d1] disabled:bg-slate-700 text-white font-bold py-3.5 rounded-xl shadow-[0_0_20px_rgba(92,92,255,0.4)] hover:shadow-[0_0_25px_rgba(92,92,255,0.6)] transition-all duration-300 transform active:scale-[0.98] mt-4 flex items-center justify-center gap-2"
             >
               {isLoading && <Loader2 className="animate-spin" size={18} />}
               {isLoading ? 'Processing...' : 'Join Now!'}

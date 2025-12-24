@@ -9,6 +9,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import AdminSidebar from '../../../components/admin/AdminSidebar';
 import AdminAuthGuard from '../../../components/admin/AdminAuthGuard';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function UserManagementPage() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -29,7 +31,7 @@ export default function UserManagementPage() {
     const fetchUsers = async () => {
       try {
         const token = localStorage.getItem('admin_token');
-        const res = await fetch('http://localhost:8000/api/admin/users', {
+        const res = await fetch(`${API_URL}/api/admin/users`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
@@ -74,7 +76,7 @@ export default function UserManagementPage() {
     if (confirm("Apakah Anda yakin ingin membuka blokir (Unban) user ini?")) {
       try {
         const token = localStorage.getItem('admin_token');
-        const res = await fetch(`http://localhost:8000/api/admin/users/${userId}/toggle-status`, {
+        const res = await fetch(`${API_URL}/api/admin/users/${userId}/toggle-status`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${token}`,
@@ -97,7 +99,7 @@ export default function UserManagementPage() {
   const confirmBanUser = async () => {
     try {
       const token = localStorage.getItem('admin_token');
-      const res = await fetch(`http://localhost:8000/api/admin/users/${selectedUser.id}/toggle-status`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${selectedUser.id}/toggle-status`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -124,7 +126,7 @@ export default function UserManagementPage() {
   const confirmDeleteUser = async () => {
     try {
       const token = localStorage.getItem('admin_token');
-      const res = await fetch(`http://localhost:8000/api/admin/users/${selectedUser.id}`, {
+      const res = await fetch(`${API_URL}/api/admin/users/${selectedUser.id}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,

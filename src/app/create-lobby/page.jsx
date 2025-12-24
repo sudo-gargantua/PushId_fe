@@ -7,6 +7,8 @@ import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "@/store/useAuthStore";
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function CreateLobby() {
   const router = useRouter();
 
@@ -58,9 +60,9 @@ export default function CreateLobby() {
     console.log('[CREATE LOBBY] Form Data:', formData);
 
     try {
-      const API_URL = "http://localhost:8000/api";
+      // API_URL is now defined at top level
 
-      const response = await axios.post(`${API_URL}/lobbies`, formData, {
+      const response = await axios.post(`${API_URL}/api/lobbies`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",

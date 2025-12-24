@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 // Game theme mapping inline (tanpa dependency eksternal)
 const GAME_THEMES = {
   'honor of kings': { label: 'Honor of Kings', className: 'bg-purple-500/20 text-purple-400 border border-purple-500/50' },
@@ -38,7 +40,7 @@ export default function LobbyDetail() {
       try {
         console.log('[LOBBY DETAIL] Fetching lobby with slug:', slug);
 
-        const response = await fetch(`http://localhost:8000/api/lobbies/${slug}`);
+        const response = await fetch(`${API_URL}/api/lobbies/${slug}`);
 
         console.log('[LOBBY DETAIL] Response status:', response.status);
 

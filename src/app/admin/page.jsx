@@ -9,6 +9,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import AdminAuthGuard from '../../components/admin/AdminAuthGuard';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function AdminPage() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,7 +27,7 @@ export default function AdminPage() {
     const fetchReports = async () => {
       try {
         const token = localStorage.getItem('admin_token');
-        const res = await fetch('http://localhost:8000/api/admin/reports', {
+        const res = await fetch(`${API_URL}/api/admin/reports`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
@@ -69,7 +71,7 @@ export default function AdminPage() {
     try {
       const token = localStorage.getItem('admin_token');
       // Mark report as resolved
-      const res = await fetch(`http://localhost:8000/api/admin/reports/${selectedReport.id}/resolve`, {
+      const res = await fetch(`${API_URL}/api/admin/reports/${selectedReport.id}/resolve`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,

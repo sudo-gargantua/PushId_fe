@@ -6,6 +6,8 @@ import AdminAuthGuard from '../../../components/admin/AdminAuthGuard';
 import { Search, Filter, Trash2, Users, AlertTriangle } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function ManageLobbiesPage() {
   const [lobbies, setLobbies] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -18,7 +20,7 @@ export default function ManageLobbiesPage() {
     const fetchLobbies = async () => {
       try {
         const token = localStorage.getItem('admin_token');
-        const res = await fetch('http://localhost:8000/api/admin/lobbies', {
+        const res = await fetch(`${API_URL}/api/admin/lobbies`, {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json',
@@ -77,7 +79,7 @@ export default function ManageLobbiesPage() {
     if (confirm('Apakah Anda yakin ingin menghapus lobby ini?')) {
       try {
         const token = localStorage.getItem('admin_token');
-        const res = await fetch(`http://localhost:8000/api/admin/lobbies/${id}`, {
+        const res = await fetch(`${API_URL}/api/admin/lobbies/${id}`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${token}`,

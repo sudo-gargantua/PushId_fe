@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/Toast';
 import { useAdminAuthStore } from '@/store/useAdminAuthStore';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 export default function AdminLoginPage() {
   const router = useRouter();
   const toast = useToast();
@@ -28,7 +30,7 @@ export default function AdminLoginPage() {
 
     try {
       // Call real backend API for admin login
-      const response = await fetch('http://localhost:8000/api/admin/login', {
+      const response = await fetch(`${API_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

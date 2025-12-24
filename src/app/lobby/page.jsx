@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import toast, { Toaster } from 'react-hot-toast';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8000';
+
 const CATEGORIES = ['ALL', 'HONOR OF KINGS', 'MOBILE LEGENDS', 'VALORANT', 'PUBG', 'COD'];
 
 const GAME_COLORS = {
@@ -33,7 +35,7 @@ export default function LobbyPage() {
 
   const fetchLobbies = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/lobbies');
+      const res = await fetch(`${API_URL}/api/lobbies`);
       const json = await res.json();
       setLobbies(json.data || json);
     } catch (err) {
@@ -70,7 +72,7 @@ export default function LobbyPage() {
       return;
     }
     try {
-      const res = await fetch(`http://localhost:8000/api/lobbies/${selectedLobby.id}/report`, {
+      const res = await fetch(`${API_URL}/api/lobbies/${selectedLobby.id}/report`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -118,7 +120,7 @@ export default function LobbyPage() {
     if (!confirm("Apakah Anda yakin ingin menghapus lobi Anda?")) return;
 
     try {
-      const res = await fetch(`http://localhost:8000/api/lobbies/${item.slug}`, {
+      const res = await fetch(`${API_URL}/api/lobbies/${item.slug}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
