@@ -1,0 +1,16 @@
+# robots.txt untuk PushID
+# File ini mengontrol bagaimana crawler mesin pencari mengakses website
+
+# Izinkan semua crawler mengakses semua halaman publik
+User-agent: *
+Allow: /
+
+# Blokir halaman admin dari indexing (halaman internal)
+Disallow: /admin/
+Disallow: /admin
+
+# Blokir halaman API internal
+Disallow: /api/
+
+# Lokasi sitemap
+Sitemap: https://pushid.com/sitemap.xml
