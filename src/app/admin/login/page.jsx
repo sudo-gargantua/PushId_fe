@@ -45,6 +45,10 @@ export default function AdminLoginPage() {
       const data = await response.json();
 
       if (response.ok) {
+        // Debug: Log response dari backend
+        console.log('[ADMIN LOGIN] Response data:', data);
+        console.log('[ADMIN LOGIN] Token from API:', data.token);
+
         // Login berhasil - simpan token asli dari backend
         const adminData = {
           id: data.user.id,
@@ -56,6 +60,11 @@ export default function AdminLoginPage() {
 
         // Simpan token ke localStorage untuk API calls
         localStorage.setItem('admin_token', data.token);
+
+        // Debug: Verifikasi token tersimpan
+        const savedToken = localStorage.getItem('admin_token');
+        console.log('[ADMIN LOGIN] Token saved successfully:', !!savedToken);
+        console.log('[ADMIN LOGIN] Saved token value:', savedToken?.substring(0, 20) + '...');
 
         // Update zustand store
         loginAdmin(adminData, data.token);
