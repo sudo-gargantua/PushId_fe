@@ -70,6 +70,23 @@ export default function AdminPage() {
 
     try {
       const token = localStorage.getItem('admin_token');
+
+      // Jika aksi adalah hapus lobby, hapus lobby terlebih dahulu
+      if (actionType === 'delete_lobby' && selectedReport.lobby_id) {
+        const deleteLobbyRes = await fetch(`${API_URL}/api/admin/lobbies/${selectedReport.lobby_id}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/json',
+          }
+        });
+
+        if (!deleteLobbyRes.ok) {
+          toast.error('Gagal menghapus lobby');
+          return;
+        }
+      }
+
       // Mark report as resolved
       const res = await fetch(`${API_URL}/api/admin/reports/${selectedReport.id}/resolve`, {
         method: 'PATCH',
@@ -83,11 +100,12 @@ export default function AdminPage() {
       if (res.ok) {
         setReports(reports.map(r => r.id === selectedReport.id ? { ...r, status: 'resolved' } : r));
         setShowActionModal(false);
-        toast.success(actionType === 'delete_lobby' ? 'Lobby dihapus & User dinotifikasi!' : 'User di-Banned!');
+        toast.success(actionType === 'delete_lobby' ? 'Lobby berhasil dihapus & Report diselesaikan!' : 'User di-Banned!');
       } else {
         toast.error('Gagal memproses tindakan');
       }
     } catch (err) {
+      console.error('Error:', err);
       toast.error('Terjadi kesalahan');
     }
   };

@@ -60,6 +60,24 @@ export default function LoginPage() {
       console.log('[LOGIN] API Response:', data);
 
       if (!response.ok) {
+        // Cek apakah user di-banned
+        if (data.is_banned) {
+          toast.dismiss(loadingToast);
+          const banUntil = data.ban_until ? new Date(data.ban_until).toLocaleDateString('id-ID') : 'Permanen';
+          toast.error(
+            `Akun Anda ditangguhkan. Alasan: ${data.reason}. Berlaku sampai: ${banUntil}`,
+            {
+              duration: 8000,
+              style: {
+                background: '#7f1d1d',
+                color: '#fff',
+                border: '1px solid #ef4444',
+              },
+            }
+          );
+          setIsLoading(false);
+          return;
+        }
         throw new Error(data?.message || 'Email atau password salah');
       }
 
